@@ -1,0 +1,6 @@
+{
+  "name": "抠门大赛 · 植物图鉴版",
+  "description": "极致克制与留白，复古植物手绘美学好友互助抠门省钱应用",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

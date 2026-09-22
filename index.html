@@ -1,0 +1,3897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>抠门大赛 · 植物图鉴版</title>
+  <meta name="description" content="极致克制与留白，复古植物手绘美学好友互助抠门省钱应用">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 高级中文字体 (霞鹜文楷 + 系统字体优雅降级) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            parchment: '#FAF7F2',
+            pureWhite: '#FFFFFF',
+            terracottaRed: '#E34A32',
+            terracottaHover: '#D13F27',
+            warmCream: '#F6EFE9',
+            warmCreamHover: '#EDE3DC',
+            obsidianBlack: '#181D1B',
+            botanicalInk: '#1C2621',
+            botanicalMuted: '#707D76',
+            botanicalBorder: '#EFE6D8',
+            lemonGold: '#EAB026',
+            tomatoRed: '#D63B29',
+            cactusGreen: '#3C624B',
+            silkRibbon: '#F1E4D0'
+          },
+          fontFamily: {
+            sans: ['"PingFang SC"', '"LXGW WenKai Lite"', '"Songti SC"', '"STSong"', 'serif', '-apple-system', 'sans-serif'],
+            din: ['"DIN Alternate"', '"DIN"', '"SF Pro Display"', '-apple-system', 'sans-serif']
+          },
+          boxShadow: {
+            subtleCard: '0 8px 30px rgba(120, 100, 80, 0.05)',
+            floatingCard: '0 14px 38px rgba(110, 90, 70, 0.07)',
+            softBtnRed: '0 8px 22px rgba(227, 74, 50, 0.22)',
+            softBtnCream: '0 6px 18px rgba(120, 100, 80, 0.06)',
+            softNav: '0 12px 32px rgba(100, 85, 70, 0.1)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #1C2621;
+      font-family: "PingFang SC", "LXGW WenKai Lite", "Songti SC", serif;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior-y: none;
+      user-select: none;
+    }
+
+    .font-din {
+      font-family: "DIN Alternate", "DIN", "SF Pro Display", -apple-system, sans-serif;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* 盖章动效 */
+    @keyframes stampStrike {
+      0% { transform: scale(2.4) rotate(-18deg); opacity: 0; }
+      65% { transform: scale(0.96) rotate(-4deg); opacity: 0.95; }
+      100% { transform: scale(1) rotate(-5deg); opacity: 0.95; }
+    }
+    .stamp-animate {
+      animation: stampStrike 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* 驳回卡片震颤与理由报错抖动动效 */
+    @keyframes animCardRejectShake {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      15% { transform: translate(-10px, -2px) rotate(-1.5deg); }
+      30% { transform: translate(10px, 2px) rotate(1.5deg); }
+      45% { transform: translate(-7px, 1px) rotate(-1deg); }
+      60% { transform: translate(7px, -1px) rotate(1deg); }
+      75% { transform: translate(-4px, 0) rotate(-0.5deg); }
+      90% { transform: translate(4px, 0) rotate(0.5deg); }
+    }
+    .card-reject-shake {
+      animation: animCardRejectShake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    @keyframes animInputErrorShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .input-error-shake {
+      animation: animInputErrorShake 0.45s ease-in-out both;
+    }
+
+    /* 购买申请通过动效：更可爱、更好看、更生动的Q弹浮升动效 (Adorable Bouncy Spring & Gentle Floating Animation) */
+    @keyframes animCutePopFloat {
+      0% {
+        transform: translate(0, 0) scale(0) rotate(-25deg);
+        opacity: 0;
+      }
+      22% {
+        transform: translate(calc(var(--tx) * 0.35), calc(var(--ty) * 0.45 - 14px)) scale(1.35) rotate(calc(var(--rot) * 0.5));
+        opacity: 1;
+      }
+      45% {
+        transform: translate(calc(var(--tx) * 0.7), calc(var(--ty) * 0.8)) scale(0.95) rotate(var(--rot));
+        opacity: 0.95;
+      }
+      70% {
+        transform: translate(var(--tx), var(--ty)) scale(1.08) rotate(calc(var(--rot) + 12deg));
+        opacity: 0.92;
+      }
+      100% {
+        transform: translate(calc(var(--tx) * 1.18), calc(var(--ty) - 28px)) scale(0.82) rotate(calc(var(--rot) + 24deg));
+        opacity: 0;
+      }
+    }
+    .cute-pass-particle {
+      position: absolute;
+      pointer-events: none;
+      animation: animCutePopFloat var(--dur) cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
+    }
+    .botanical-particle {
+      position: absolute;
+      pointer-events: none;
+      animation: animCutePopFloat var(--dur) cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
+    }
+
+    /* ==================== 成就徽章：植物发芽开花轻柔 CSS 动效 ==================== */
+    /* 待唤醒静态状态 (Idle) */
+    .plant-stage.is-idle .p-seed {
+      transform: scale(1) translateY(0);
+      opacity: 0.95;
+      transition: transform 0.4s ease;
+    }
+    .plant-stage.is-idle .p-stem {
+      stroke-dashoffset: 160;
+      opacity: 0;
+    }
+    .plant-stage.is-idle .p-leaf-l,
+    .plant-stage.is-idle .p-leaf-r,
+    .plant-stage.is-idle .p-flower,
+    .plant-stage.is-idle .p-halo,
+    .plant-stage.is-idle .p-dew {
+      transform: scale(0);
+      opacity: 0;
+    }
+
+    /* 生长动画激活状态 (Growing) */
+    .plant-stage.is-growing .p-seed {
+      animation: animSeedGerminate 1.1s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+      transform-origin: 50px 104px;
+    }
+    .plant-stage.is-growing .p-stem {
+      animation: animStemDraw 1.6s 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .plant-stage.is-growing .p-leaf-l {
+      animation: animLeafLeft 1.3s 1.4s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+      transform-origin: 50px 72px;
+    }
+    .plant-stage.is-growing .p-leaf-r {
+      animation: animLeafRight 1.3s 1.7s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+      transform-origin: 50px 58px;
+    }
+    .plant-stage.is-growing .p-flower {
+      animation: animFlowerBloom 1.5s 2.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transform-origin: 50px 30px;
+    }
+    .plant-stage.is-growing .p-halo {
+      animation: animFlowerHalo 1.8s 2.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transform-origin: 50px 30px;
+    }
+    .plant-stage.is-growing .p-dew {
+      animation: animDewDrift 1.6s 3.0s ease-out forwards;
+    }
+
+    /* 盛开保持状态 (Bloomed) */
+    .plant-stage.is-bloomed .p-seed {
+      transform: scale(0.85) translateY(1px);
+      opacity: 0.45;
+    }
+    .plant-stage.is-bloomed .p-stem {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    .plant-stage.is-bloomed .p-leaf-l {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    .plant-stage.is-bloomed .p-leaf-r {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    .plant-stage.is-bloomed .p-flower {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    .plant-stage.is-bloomed .p-halo {
+      transform: scale(1.1);
+      opacity: 0.25;
+    }
+    .plant-stage.is-bloomed .p-dew {
+      opacity: 0.7;
+    }
+
+    /* 关键帧细则：极简克制，轻柔自然，如日系手帐中的植物水彩插画舒展 */
+    @keyframes animSeedGerminate {
+      0% { transform: scale(1) translateY(0); filter: brightness(1); }
+      40% { transform: scale(1.35) translateY(-2px); filter: brightness(1.2); }
+      75% { transform: scale(0.95) translateY(0); opacity: 0.9; }
+      100% { transform: scale(0.85) translateY(1px); opacity: 0.45; }
+    }
+
+    @keyframes animStemDraw {
+      0% { stroke-dashoffset: 160; opacity: 0; }
+      12% { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+
+    @keyframes animLeafLeft {
+      0% { transform: scale(0) rotate(-40deg); opacity: 0; }
+      60% { transform: scale(1.15) rotate(4deg); opacity: 0.95; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    @keyframes animLeafRight {
+      0% { transform: scale(0) rotate(40deg); opacity: 0; }
+      60% { transform: scale(1.15) rotate(-4deg); opacity: 0.95; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    @keyframes animFlowerBloom {
+      0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+      55% { transform: scale(0.7) rotate(-10deg); opacity: 0.9; }
+      80% { transform: scale(1.12) rotate(3deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    @keyframes animFlowerHalo {
+      0% { transform: scale(0.4); opacity: 0; }
+      50% { opacity: 0.45; }
+      100% { transform: scale(1.15); opacity: 0.25; }
+    }
+
+    @keyframes animDewDrift {
+      0% { opacity: 0; transform: translateY(4px); }
+      40% { opacity: 0.9; }
+      100% { opacity: 0.7; transform: translateY(-8px); }
+    }
+
+    /* 徽章容器温润微脉动 */
+    @keyframes badgeParchmentBreath {
+      0%, 100% { box-shadow: 0 4px 16px rgba(60, 98, 75, 0.08); }
+      50% { box-shadow: 0 8px 24px rgba(227, 74, 50, 0.16); }
+    }
+    .badge-interactive-active {
+      animation: badgeParchmentBreath 3s infinite ease-in-out;
+    }
+
+    /* ==================== 勋章动效 2：心如止水 清泉水滴与涟漪动画 ==================== */
+    @keyframes animWaterDropletDrop {
+      0% { transform: translateY(-38px) scale(0.5); opacity: 0; }
+      20% { opacity: 1; transform: translateY(-22px) scale(1); }
+      65% { transform: translateY(0px) scale(1.1); opacity: 1; }
+      75% { transform: translateY(3px) scale(1.35, 0.55); opacity: 0.9; }
+      100% { transform: translateY(0px) scale(0); opacity: 0; }
+    }
+
+    @keyframes animWaterRipple1 {
+      0% { transform: scale(0.2); opacity: 0; }
+      20% { opacity: 0.95; }
+      70% { opacity: 0.6; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    @keyframes animWaterRipple2 {
+      0% { transform: scale(0.12); opacity: 0; }
+      25% { opacity: 0.85; }
+      75% { opacity: 0.45; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    @keyframes animWaterRipple3 {
+      0% { transform: scale(0.08); opacity: 0; }
+      30% { opacity: 0.75; }
+      80% { opacity: 0.35; }
+      100% { transform: scale(1.85); opacity: 0; }
+    }
+
+    @keyframes animWaterSproutSway {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-3deg); }
+      50% { transform: rotate(2.5deg); }
+      75% { transform: rotate(-1.2deg); }
+    }
+
+    @keyframes animWaterHaloPulse {
+      0% { transform: scale(0.3); opacity: 0; }
+      35% { opacity: 0.5; transform: scale(1.05); }
+      70% { opacity: 0.3; transform: scale(1.15); }
+      100% { opacity: 0.12; transform: scale(1.25); }
+    }
+
+    /* 水舞台各状态管理 */
+    .water-stage.is-idle .w-drop {
+      transform: translateY(-38px);
+      opacity: 0;
+    }
+    .water-stage.is-idle .w-ripple-1,
+    .water-stage.is-idle .w-ripple-2,
+    .water-stage.is-idle .w-ripple-3 {
+      transform: scale(1);
+      opacity: 0.35;
+    }
+    .water-stage.is-idle .w-halo {
+      opacity: 0;
+    }
+
+    .water-stage.is-rippling .w-drop {
+      animation: animWaterDropletDrop 0.85s cubic-bezier(0.3, 0, 0.8, 0.15) forwards;
+      transform-origin: 50px 65px;
+    }
+    .water-stage.is-rippling .w-ripple-1 {
+      animation: animWaterRipple1 1.8s 0.65s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
+      transform-origin: 50px 70px;
+    }
+    .water-stage.is-rippling .w-ripple-2 {
+      animation: animWaterRipple2 2.1s 0.85s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
+      transform-origin: 50px 70px;
+    }
+    .water-stage.is-rippling .w-ripple-3 {
+      animation: animWaterRipple3 2.4s 1.05s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
+      transform-origin: 50px 70px;
+    }
+    .water-stage.is-rippling .w-sprout {
+      animation: animWaterSproutSway 2.4s 0.7s ease-in-out forwards;
+      transform-origin: 50px 70px;
+    }
+    .water-stage.is-rippling .w-halo {
+      animation: animWaterHaloPulse 2.6s 0.7s ease-out forwards;
+      transform-origin: 50px 70px;
+    }
+
+    .water-stage.is-calmed .w-drop {
+      opacity: 0;
+    }
+    .water-stage.is-calmed .w-ripple-1,
+    .water-stage.is-calmed .w-ripple-2,
+    .water-stage.is-calmed .w-ripple-3 {
+      transform: scale(1);
+      opacity: 0.65;
+    }
+    .water-stage.is-calmed .w-sprout {
+      transform: rotate(0deg);
+    }
+    .water-stage.is-calmed .w-halo {
+      opacity: 0.15;
+    }
+
+    /* ==================== 植物生命美学：统一动效引擎 (Unified Botanical Motion Engine) ==================== */
+    /* 1. 首页标本卡片：植物呼吸微震颤 (Organic Plant Breathing Micro-Tremor) */
+    @keyframes animBotanicalBreathTremor {
+      0% {
+        transform: scale(1);
+        filter: drop-shadow(0 2px 5px rgba(60, 98, 75, 0.06));
+      }
+      20% {
+        transform: scale(1.026) translateY(-1.2px) rotate(-0.3deg);
+        filter: drop-shadow(0 7px 15px rgba(60, 98, 75, 0.15));
+      }
+      35% {
+        transform: scale(1.018) translateY(-0.6px) rotate(0.3deg);
+      }
+      50% {
+        transform: scale(1.028) translateY(-1.4px) rotate(-0.2deg);
+        filter: drop-shadow(0 6px 14px rgba(60, 98, 75, 0.13));
+      }
+      65% {
+        transform: scale(1.015) translateY(-0.4px) rotate(0.15deg);
+      }
+      80% {
+        transform: scale(1.008) translateY(-0.2px);
+      }
+      100% {
+        transform: scale(1) translateY(0) rotate(0deg);
+        filter: drop-shadow(0 2px 5px rgba(60, 98, 75, 0.06));
+      }
+    }
+
+    /* 标本镜内植物与叶脉微颤 (Inner Specimen Leaf Jitter) */
+    @keyframes animSpecimenLeafJitter {
+      0% { transform: scale(1); }
+      22% { transform: scale(1.032) rotate(0.6deg); }
+      40% { transform: scale(1.018) rotate(-0.4deg); }
+      58% { transform: scale(1.026) rotate(0.3deg); }
+      78% { transform: scale(1.01) rotate(-0.1deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    /* 植物呼吸生命光晕脉动 (Botanical Life Aura Pulse) */
+    @keyframes animBotanicalAuraPulse {
+      0% {
+        transform: scale(0.96);
+        opacity: 0;
+      }
+      25% {
+        transform: scale(1.08);
+        opacity: 0.75;
+        box-shadow: 0 0 16px rgba(60, 98, 75, 0.18), inset 0 0 8px rgba(60, 98, 75, 0.08);
+      }
+      60% {
+        transform: scale(1.03);
+        opacity: 0.35;
+        box-shadow: 0 0 8px rgba(60, 98, 75, 0.1);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0;
+        box-shadow: none;
+      }
+    }
+
+    /* 常驻微风摇曳缓动 */
+    @keyframes animTomatoRibbonSway {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-2.5px) rotate(0.8deg); }
+    }
+    .tomato-ribbon-float {
+      animation: animTomatoRibbonSway 4.5s ease-in-out infinite;
+    }
+    .botanical-breathing-tremor {
+      animation: animBotanicalBreathTremor 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .specimen-leaf-jitter {
+      animation: animSpecimenLeafJitter 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .botanical-aura-pulse {
+      animation: animBotanicalAuraPulse 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .tomato-ribbon-bounce {
+      animation: animBotanicalBreathTremor 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    /* ==================== 记账成功：放彩带与放烟花交互动画 ==================== */
+    @keyframes animRibbonConfetti {
+      0% {
+        transform: translateY(-40px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.8);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      85% {
+        opacity: 0.95;
+      }
+      100% {
+        transform: translateY(720px) rotateX(720deg) rotateY(540deg) rotateZ(360deg) scale(1.05);
+        opacity: 0;
+      }
+    }
+
+    @keyframes animFireworkBurst {
+      0% {
+        transform: scale(0.1) rotate(0deg);
+        opacity: 0;
+      }
+      25% {
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.65) rotate(45deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes animPopCelebrateCard {
+      0% {
+        transform: scale(0.7) translateY(45px);
+        opacity: 0;
+      }
+      65% {
+        transform: scale(1.03) translateY(-6px);
+        opacity: 1;
+      }
+      85% {
+        transform: scale(0.98) translateY(2px);
+      }
+      100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .celebrate-card-enter {
+      animation: animPopCelebrateCard 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .firework-spark-ring {
+      animation: animFireworkBurst 1.2s ease-out forwards;
+    }
+
+    /* 驳回印章与震撼动效 */
+    @keyframes animRejectStamp {
+      0% {
+        transform: scale(2.5) rotate(-18deg);
+        opacity: 0;
+      }
+      55% {
+        transform: scale(0.92) rotate(-6deg);
+        opacity: 0.95;
+      }
+      75% {
+        transform: scale(1.06) rotate(-4deg);
+      }
+      100% {
+        transform: scale(1) rotate(-5deg);
+        opacity: 1;
+      }
+    }
+    .stamp-reject-active {
+      animation: animRejectStamp 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes animCardRejectShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px) rotate(-0.5deg); }
+      40% { transform: translateX(5px) rotate(0.5deg); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(3px); }
+    }
+    .card-reject-shake {
+      animation: animCardRejectShake 0.42s ease-in-out;
+    }
+
+    @keyframes animInputErrorShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    .input-error-shake {
+      animation: animInputErrorShake 0.32s ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#FAF7F2] flex justify-center text-[#1C2621]">
+
+  <!-- 移动端框架容器 (整页极致洁净清透的淡暖羊皮纸画布 #FAF7F2，无大面积花俏背景，保持充裕呼吸感) -->
+  <div class="w-full max-w-md min-h-screen bg-[#FAF7F2] relative flex flex-col shadow-2xl overflow-hidden pb-24">
+
+    <!-- ==================== 1. 首页 (Home Screen - LOEWE Botanical Masterpiece) ==================== -->
+    <div id="view-home" class="page-view flex-1 flex flex-col relative z-10">
+      
+      <!-- 首页头部：高雅克制，植物手账风 -->
+      <header class="px-6 pt-7 pb-2 relative z-10">
+        <div class="flex items-center justify-between">
+          <div class="inline-flex flex-col items-start">
+            <div class="flex items-center gap-1.5 mb-0.5">
+              <span id="home-today-date-tag" class="text-[10px] font-bold text-[#A67E48] tracking-widest uppercase bg-[#FAF5ED] px-2 py-0.5 rounded border border-[#EADBCA]">
+                2026年9月20日 · 星期日
+              </span>
+            </div>
+            <h1 class="text-lg font-bold tracking-wide text-[#1C2621] flex items-center gap-1.5">
+              <span>抠门大赛</span>
+              <span class="text-xs text-[#8C6D40] font-normal">✿</span>
+            </h1>
+          </div>
+          <span class="text-[10px] text-[#3C624B] bg-[#F0F5F2] px-2.5 py-1 rounded-full border border-[#DCE8E1] font-medium flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#3C624B]"></span>
+            理智抠门中
+          </span>
+        </div>
+      </header>
+
+      <!-- 首页核心区：纯净留白，真实罗意威复古植物手绘 -->
+      <div class="flex-1 px-6 pt-3 overflow-y-auto hide-scrollbar relative z-10">
+        
+        <!-- Hero Savings Card: 植物图鉴典藏卡片，数字与番茄、飘带、小天使有机交织 -->
+        <section class="bg-[#FFFFFF] rounded-[28px] p-5 shadow-subtleCard border border-[#F3EDE2] mb-4 relative overflow-hidden">
+          
+          <!-- 植物图鉴编号与自律标牌 -->
+          <div class="flex justify-between items-center mb-2.5 relative z-10">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] text-[#3C624B] bg-[#F0F5F2] px-2 py-0.5 rounded-full font-medium border border-[#DCE8E1]">
+                理智金库
+              </span>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] text-[#A67E48] font-medium">
+              <span>✿</span>
+              <span class="tracking-widest">守心自律</span>
+              <span>✿</span>
+            </div>
+          </div>
+
+          <!-- 核心区域：左侧理智数据，右侧自然融合的植物标本与丝质飘带手绘小品 -->
+          <div class="flex items-center justify-between my-2 relative z-10">
+            <div class="flex-1 pr-2">
+              <span class="text-xs font-semibold text-[#707D76] tracking-wider block mb-1">本周省下了</span>
+              <div class="flex items-baseline gap-1">
+                <span class="text-2xl font-light text-[#E34A32]">¥</span>
+                <span id="home-saved-display" class="font-din text-4xl sm:text-5xl font-bold text-[#181D1B] tracking-tight leading-none">128.00</span>
+              </div>
+              <div class="mt-2.5 flex items-center gap-1.5 text-[11px] text-[#707D76]">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#E34A32]"></span>
+                <span id="home-blocked-display">已成功阻击 6 笔冲动消费</span>
+              </div>
+            </div>
+
+            <!-- 右侧：自然融入卡片的植物标本镜与手绘小品 (可轻触触发植物生命呼吸微震颤与叶片摩挲声) -->
+            <div id="home-botanical-card" onclick="tapTomatoRibbon()" class="w-32 h-32 relative cursor-pointer select-none group flex items-center justify-center shrink-0 transition-all duration-300" title="轻触感受植物生命呼吸微震颤与叶片摩挲声">
+              <!-- 背后柔和暖阳微晕 -->
+              <div class="absolute inset-1 rounded-full bg-[#FAF5ED] border border-[#EADBCA]/60 transition-transform group-hover:scale-105 pointer-events-none"></div>
+              
+              <!-- 植物生命呼吸微晕光环 (触碰微震颤时绽放) -->
+              <div id="home-botanical-aura" class="absolute inset-0 rounded-full border-2 border-[#3C624B]/25 pointer-events-none opacity-0"></div>
+
+              <!-- 嵌入圆形植物标本镜中的手绘番茄与飘带插画 -->
+              <div class="relative w-28 h-28 rounded-full overflow-hidden border border-[#EADBCA] shadow-2xs bg-[#FAF7F2]">
+                <img id="home-botanical-img" src="/assets/loewe_tomato_banner.jpg" alt="植物标本与飘带" class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105" referrerPolicy="no-referrer" />
+                <div class="absolute inset-0 rounded-full border border-white/50 pointer-events-none"></div>
+              </div>
+
+              <!-- 飘拂在边缘的标本标签与交互微提示 -->
+              <div class="absolute -bottom-1 -right-0.5 bg-white/95 px-2 py-0.5 rounded-full text-[9px] text-[#A67E48] font-bold border border-[#EADBCA] shadow-xs flex items-center gap-0.5 pointer-events-none">
+                <span>✿</span>
+                <span>轻触呼吸</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 底部数据信息条：雅致植物手账注释 -->
+          <div class="pt-2.5 border-t border-[#F5EFE4] flex items-center justify-between text-xs text-[#707D76] relative z-10">
+            <span class="text-[11px] text-[#707D76] flex items-center gap-1">
+              <span>🌱</span>
+              <span>物欲克制 · 静心积跬步</span>
+            </span>
+          </div>
+        </section>
+
+        <!-- Pending Approval Card: 待我审批卡片，融入橄榄枝与天平理性元素 -->
+        <section onclick="openCourtCaseModal('红轴机械键盘', '299.00', '现在的薄膜键盘敲得我手疼，买个红轴提升生产力...')" class="bg-[#FFFFFF] rounded-[24px] p-4 shadow-subtleCard border border-[#F3EDE2] mb-5 cursor-pointer hover:bg-[#FCFAF7] transition-all active:scale-[0.99] relative overflow-hidden">
+          <div class="flex items-center justify-between mb-1.5 relative z-10">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-[#1C2621] flex items-center gap-1">
+                <span>⚖️</span>
+                <span>待我审批</span>
+              </span>
+              <span class="text-[10px] bg-[#E34A32] text-white px-2 py-0.5 rounded-full font-bold shadow-xs">
+                1 笔待处理
+              </span>
+            </div>
+            <div class="flex items-center gap-1 text-xs text-[#707D76]">
+              <span class="text-[10px] text-[#8C6D40]">好友公审</span>
+              <svg viewBox="0 0 16 16" fill="none" class="w-3.5 h-3.5 stroke-[#707D76]" stroke-width="1.8" stroke-linecap="round">
+                <path d="M6 3 L11 8 L6 13" />
+              </svg>
+            </div>
+          </div>
+          <p class="text-xs text-[#707D76] relative z-10">
+            张三的购买申请：红轴机械键盘 <span class="font-din font-bold text-[#E34A32]">¥299.00</span>
+          </p>
+        </section>
+
+        <!-- Action Buttons: 柔和陶土色与素雅温润奶油色，弱化红色饱和度以更耐看和谐 -->
+        <div class="space-y-3 mb-6">
+          <!-- 1. Softer Warm Terracotta Button: "我忍住了，记一笔省钱" (柔和暖调，不再过饱和抢眼) -->
+          <button onclick="openQuickSaveModal()" class="w-full bg-[#B85D4B] hover:bg-[#A85241] text-white rounded-[20px] py-4 px-5 shadow-sm flex items-center justify-between transition-all duration-200 active:scale-[0.985] border border-[#CA7261]/35">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center border border-white/20 text-lg">
+                🍅
+              </div>
+              <div class="text-left">
+                <h2 class="text-sm font-bold tracking-wider leading-snug flex items-center gap-1.5">
+                  <span>我忍住了，记一笔省钱</span>
+                  <span class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">✿ 抠门</span>
+                </h2>
+              </div>
+            </div>
+            <div class="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center">
+              <svg viewBox="0 0 20 20" fill="none" class="w-3.5 h-3.5 stroke-white" stroke-width="2" stroke-linecap="round">
+                <path d="M7 4 L13 10 L7 16" />
+              </svg>
+            </div>
+          </button>
+
+          <!-- 2. Warm Cream Secondary Button: "我想买，发起审批" -->
+          <button onclick="openApplyModal()" class="w-full bg-[#F6EFE9] hover:bg-[#EDE3DC] text-[#1C2621] rounded-[20px] py-4 px-5 shadow-softBtnCream flex items-center justify-between transition-all duration-200 active:scale-[0.985] border border-[#EADBCA]">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-[#E2D4C3] text-lg">
+                🌿
+              </div>
+              <div class="text-left">
+                <h2 class="text-sm font-bold tracking-wider leading-snug text-[#1C2621] flex items-center gap-1.5">
+                  <span>我想买，发起审批</span>
+                </h2>
+              </div>
+            </div>
+            <div class="w-7 h-7 rounded-full bg-[#FAF5ED] flex items-center justify-center border border-[#EADBCA]">
+              <svg viewBox="0 0 20 20" fill="none" class="w-3.5 h-3.5 stroke-[#707D76]" stroke-width="2" stroke-linecap="round">
+                <path d="M7 4 L13 10 L7 16" />
+              </svg>
+            </div>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== 2. 统计趋势页 (Statistics Page - LOEWE Botanical Style) ==================== -->
+    <div id="view-stats" class="page-view flex-1 flex flex-col relative z-10 hidden">
+      
+      <header class="px-6 pt-7 pb-2 relative z-10">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold text-[#A67E48] tracking-widest bg-[#FAF5ED] px-2 py-0.5 rounded border border-[#EADBCA] block mb-0.5 w-fit">
+              仙人掌图鉴
+            </span>
+            <h1 class="text-lg font-bold tracking-wide text-[#1C2621] flex items-center gap-1.5">
+              <span>统计趋势 · 坚韧蓄力</span>
+              <span class="text-xs text-[#4B6E57]">🌵</span>
+            </h1>
+          </div>
+          <span class="text-[10px] text-[#8C6D40] bg-[#FAF5ED] px-2.5 py-1 rounded-full border border-[#EADBCA] font-medium">
+            ✿ 硕果丰盈
+          </span>
+        </div>
+      </header>
+
+      <div class="flex-1 px-6 pt-2 overflow-y-auto hide-scrollbar relative z-10">
+        
+        <!-- Top Navigation: Tab capsule showing "本周" (Active) and "本月" -->
+        <div class="flex p-1 bg-[#FFFFFF] rounded-full border border-[#EADBCA] shadow-xs mb-4">
+          <button id="stats-tab-week" onclick="toggleStatsTab('week')" class="flex-1 py-1.5 rounded-full text-xs font-bold transition-all bg-[#FAF7F2] text-[#E34A32] shadow-xs border border-[#EADBCA]">
+            本周
+          </button>
+          <button id="stats-tab-month" onclick="toggleStatsTab('month')" class="flex-1 py-1.5 rounded-full text-xs font-bold transition-all text-[#707D76]">
+            本月
+          </button>
+        </div>
+
+        <!-- Total Savings Card: 有机融合仙人掌花与飘带的典雅植物卡片 -->
+        <section class="bg-[#FFFFFF] rounded-[28px] p-5 shadow-subtleCard mb-4 border border-[#F3EDE2] relative overflow-hidden">
+          
+          <div class="flex justify-between items-center mb-2 relative z-10">
+            <span class="text-xs font-semibold text-[#707D76] tracking-wider">累计守住</span>
+            <span class="text-[10px] text-[#3C624B] bg-[#F0F5F2] px-2 py-0.5 rounded-full font-medium border border-[#DCE8E1]">
+              仙人掌花 · 坚韧蓄力
+            </span>
+          </div>
+
+          <div class="flex items-center justify-between my-2 relative z-10">
+            <div class="flex-1 pr-2">
+              <span id="stats-amount-display" class="font-din text-4xl sm:text-5xl font-bold text-[#181D1B] tracking-tight leading-none block">
+                ¥1,280.50
+              </span>
+            </div>
+
+            <!-- 右侧：自然融合的仙人掌花手绘标本镜 -->
+            <div class="w-28 h-28 relative flex items-center justify-center shrink-0">
+              <div class="absolute inset-0.5 rounded-full bg-[#FAF5ED] border border-[#EADBCA]/60 pointer-events-none"></div>
+              <div class="relative w-24 h-24 rounded-full overflow-hidden border border-[#EADBCA] shadow-2xs bg-[#FAF7F2]">
+                <img src="/assets/loewe_stats_cactus.jpg" alt="仙人掌花与飘带" class="w-full h-full object-cover object-center" referrerPolicy="no-referrer" />
+                <div class="absolute inset-0 rounded-full border border-white/50 pointer-events-none"></div>
+              </div>
+              <span class="absolute -bottom-1 -right-0.5 bg-white/95 px-2 py-0.5 rounded-full text-[9px] text-[#3C624B] font-bold border border-[#DCE8E1] shadow-xs">
+                ✿ 恒持
+              </span>
+            </div>
+          </div>
+
+          <!-- Key Metrics Grid: Clean cards for 阻击次数 and 发起审批 -->
+          <div class="grid grid-cols-2 gap-3 pt-3 border-t border-[#F5EFE4] mt-2 relative z-10">
+            <div class="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EADBCA]/60 flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-white border border-[#EADBCA] flex items-center justify-center text-sm shadow-2xs">
+                🌵
+              </div>
+              <div>
+                <span id="metric-blocked-label" class="text-[10px] text-[#707D76] block">累计阻击</span>
+                <p class="font-din text-base font-bold text-[#1C2621] mt-0.5"><span id="metric-blocked-val">24</span> <span class="text-xs font-normal">次</span></p>
+              </div>
+            </div>
+            <div class="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EADBCA]/60 flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-white border border-[#EADBCA] flex items-center justify-center text-sm shadow-2xs">
+                🌿
+              </div>
+              <div>
+                <span id="metric-approvals-label" class="text-[10px] text-[#707D76] block">发起审批</span>
+                <p class="font-din text-base font-bold text-[#3C624B] mt-0.5"><span id="metric-approvals-val">6</span> <span class="text-xs font-normal">次</span></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== 统计日历视图：本周与本月直观展示 (Daily Savings & Approvals Calendar) ==================== -->
+        <section class="bg-[#FFFFFF] rounded-[28px] p-5 shadow-subtleCard mb-6 border border-[#F3EDE2] relative overflow-hidden">
+          
+          <!-- 日历卡片顶栏：标题与自律概览 (单行防折行设计) -->
+          <div class="mb-3.5 pb-3 border-b border-[#F6EFE4]">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-xl bg-[#FAF5ED] border border-[#EADBCA] flex items-center justify-center text-sm flex-shrink-0">
+                  📅
+                </div>
+                <div class="min-w-0">
+                  <h2 id="calendar-title" class="text-xs font-bold text-[#1C2621]">本周自律日历</h2>
+                  <p id="calendar-subtitle" class="text-[10px] text-[#707D76]">9月15日 - 9月21日 · 每日省钱明细</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <span class="text-[9px] font-bold text-[#707D76] bg-[#FAF7F2] px-2 py-0.5 rounded-full border border-[#EADBCA] whitespace-nowrap">
+                  自律打卡
+                </span>
+              </div>
+            </div>
+
+            <!-- 数据汇总横条：专辟单行空间，大字号、对齐工整，绝对不折行 -->
+            <div class="mt-2.5 flex items-center justify-between bg-[#FAF7F2] px-3.5 py-2 rounded-xl border border-[#EADBCA]">
+              <div class="flex items-center gap-1.5 whitespace-nowrap">
+                <span id="calendar-saved-label" class="text-[11px] text-[#707D76]">本周省下</span>
+                <span id="calendar-saved-val" class="font-din text-sm font-bold text-[#345942]">¥1,280.50</span>
+              </div>
+              <div class="h-3.5 w-px bg-[#EADBCA]"></div>
+              <div class="flex items-center gap-1.5 whitespace-nowrap">
+                <span id="calendar-approvals-label" class="text-[11px] text-[#707D76]">发起把关</span>
+                <span id="calendar-approvals-val" class="font-din text-sm font-bold text-[#8C6D40]">6 <span class="text-[10px] font-normal">次审批</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1. 本周日历视图 (Week Calendar) -->
+          <div id="calendar-week-view" class="space-y-2">
+            <!-- 7天日历网格：间距调优为 gap-1，容纳完整金额数字显示 -->
+            <div id="week-days-grid" class="grid grid-cols-7 gap-1 text-center">
+              <!-- JS动态渲染周一至周日7天卡片 -->
+            </div>
+          </div>
+
+          <!-- 2. 本月日历视图 (Month Calendar) -->
+          <div id="calendar-month-view" class="hidden">
+            <!-- 月历星期表头 -->
+            <div class="grid grid-cols-7 gap-1 text-center mb-2 pb-1.5 border-b border-[#F6EFE4]">
+              <span class="text-[10px] font-bold text-[#707D76]">一</span>
+              <span class="text-[10px] font-bold text-[#707D76]">二</span>
+              <span class="text-[10px] font-bold text-[#707D76]">三</span>
+              <span class="text-[10px] font-bold text-[#707D76]">四</span>
+              <span class="text-[10px] font-bold text-[#707D76]">五</span>
+              <span class="text-[10px] font-bold text-[#707D76]">六</span>
+              <span class="text-[10px] font-bold text-[#E34A32]">日</span>
+            </div>
+            <!-- 月历30天格子 -->
+            <div id="month-days-grid" class="grid grid-cols-7 gap-1">
+              <!-- JS动态渲染本月日历格子 -->
+            </div>
+          </div>
+
+          <!-- 3. 点击日历格展开的当日明细 (Selected Day Details) -->
+          <div id="calendar-day-detail-box" class="mt-4 pt-3.5 border-t border-[#F5EFE4] bg-[#FAF7F2] rounded-2xl p-3.5 border border-[#EADBCA]">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span id="detail-date-title" class="text-xs font-bold text-[#1C2621]">9月21日 · 星期日</span>
+                  <span id="detail-date-pill" class="text-[9px] font-bold text-[#E34A32] bg-[#FAF2F0] px-1.5 py-0.2 rounded border border-[#F6DCD8]">今日</span>
+                </div>
+                <p class="text-[10px] text-[#707D76] mt-0.5">点击上方任意日期可切换查看当天记录</p>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] text-[#707D76] block">当天省下</span>
+                <span id="detail-date-saved" class="font-din text-base font-bold text-[#E34A32]">+¥299.00</span>
+              </div>
+            </div>
+
+            <!-- 统计标签栏 -->
+            <div class="flex items-center gap-2 mb-2.5">
+              <span id="detail-pill-saved" class="text-[10px] font-bold text-[#345942] bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">
+                已省 ¥299.00
+              </span>
+              <span id="detail-pill-approval" class="text-[10px] font-bold text-[#8C6D40] bg-[#FAF5ED] px-2 py-0.5 rounded-full border border-[#EADBCA]">
+                发起 1 次审批
+              </span>
+            </div>
+
+            <!-- 当日行为小清单 -->
+            <div id="detail-date-records" class="space-y-1.5 text-[11px] text-[#1C2621]">
+              <!-- JS动态注入该日明细条目 -->
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ==================== 3. 排行榜页 (Leaderboard Page - LOEWE Botanical Masterpiece) ==================== -->
+    <div id="view-rank" class="page-view flex-1 flex flex-col relative z-10 hidden">
+      
+      <!-- Header: 抠门金榜 -->
+      <header class="px-6 pt-7 pb-2 relative z-10">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold text-[#A67E48] tracking-widest bg-[#FAF5ED] px-2 py-0.5 rounded border border-[#EADBCA] block mb-0.5 w-fit">
+              🐔 铁公鸡封神榜
+            </span>
+            <h1 class="text-lg font-bold tracking-wide text-[#1C2621] flex items-center gap-1.5">
+              <span>全国抠门大赛 · 封神金榜</span>
+              <span class="text-xs text-[#E34A32]">🏆</span>
+            </h1>
+          </div>
+          <span class="text-[10px] text-[#A67E48] bg-[#FAF5ED] px-2.5 py-1 rounded-full border border-[#EADBCA] font-medium">
+            一毛不拔 ✿ 穷中求胜
+          </span>
+        </div>
+      </header>
+
+      <div class="flex-1 px-6 pt-2 overflow-y-auto hide-scrollbar relative z-10">
+        
+        <!-- Top 3 Podium: 抠门三甲封神领奖台 -->
+        <section class="mb-5 bg-[#FFFFFF] rounded-[28px] p-4 shadow-subtleCard border border-[#F3EDE2] relative overflow-hidden">
+          
+          <div class="flex justify-between items-center mb-3">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs text-[#A67E48]">🐔</span>
+              <span class="text-xs font-bold text-[#1C2621]">抠门三甲 · 封神榜</span>
+            </div>
+            <span class="text-[10px] text-[#707D76] bg-[#FAF7F2] px-2 py-0.5 rounded-full border border-[#EADBCA]">
+              每周一决出金牌铁公鸡
+            </span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 items-end pt-3 pb-1">
+            
+            <!-- Rank 2: 李四 ¥720.00 - 不锈钢守财奴 -->
+            <div class="bg-[#FAF7F2] rounded-2xl p-2.5 border border-[#EADBCA]/70 text-center flex flex-col items-center">
+              
+              <!-- 头像区域 (固定无重叠尺寸) -->
+              <div class="relative w-12 h-12 mb-1 flex items-center justify-center">
+                <!-- 银叶月桂 -->
+                <svg viewBox="0 0 48 48" fill="none" class="absolute inset-0 w-full h-full pointer-events-none">
+                  <circle cx="24" cy="24" r="22" stroke="#707D76" stroke-width="1" stroke-dasharray="2 3" opacity="0.7" />
+                  <path d="M8 22 C5 17, 10 13, 13 18" stroke="#707D76" stroke-width="1.2" stroke-linecap="round" />
+                  <path d="M40 22 C43 17, 38 13, 35 18" stroke="#707D76" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+                <div class="w-10 h-10 rounded-full bg-[#FFFFFF] flex items-center justify-center font-bold text-xs text-[#55695D] border border-[#EADBCA] shadow-2xs">
+                  李四
+                </div>
+                <span class="absolute -bottom-1 -right-1 w-4.5 h-4.5 bg-[#707D76] text-white rounded-full text-[9px] font-bold flex items-center justify-center shadow-xs">
+                  2
+                </span>
+              </div>
+
+              <span class="text-xs font-bold text-[#1C2621] block truncate max-w-full">李四</span>
+              
+              <span class="text-[9px] text-[#55695D] bg-[#EBF4EE] px-1.5 py-0.5 rounded font-bold mt-1 border border-[#D5E8DC] whitespace-nowrap block">
+                守财奴
+              </span>
+              
+              <p class="font-din text-xs font-bold text-[#E34A32] mt-1">¥720.00</p>
+            </div>
+
+            <!-- Rank 1: 张三 ¥850.00 - 钛金铁公鸡 -->
+            <div class="bg-[#FFFDF9] rounded-2xl p-2.5 border-2 border-[#EADBCA] text-center flex flex-col items-center relative -translate-y-2 shadow-xs">
+              
+              <!-- 皇冠微标 -->
+              <div class="flex items-center justify-center -mb-0.5">
+                <span class="text-sm">👑</span>
+              </div>
+
+              <!-- 头像区域 -->
+              <div class="relative w-14 h-14 mb-1 flex items-center justify-center">
+                <!-- 金枝月桂 -->
+                <svg viewBox="0 0 56 56" fill="none" class="absolute inset-0 w-full h-full pointer-events-none">
+                  <circle cx="28" cy="28" r="26" stroke="#D19E20" stroke-width="1.4" opacity="0.8" />
+                  <path d="M8 26 C4 18, 12 14, 17 20" stroke="#D19E20" stroke-width="1.3" stroke-linecap="round" />
+                  <path d="M48 26 C52 18, 44 14, 39 20" stroke="#D19E20" stroke-width="1.3" stroke-linecap="round" />
+                </svg>
+                <div class="w-11 h-11 rounded-full bg-[#FAF5ED] flex items-center justify-center font-black text-sm text-[#1C2621] border border-[#EADBCA] shadow-2xs">
+                  张三
+                </div>
+                <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-[#E34A32] text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
+                  1
+                </span>
+              </div>
+
+              <span class="text-xs font-black text-[#1C2621] block truncate max-w-full">张三</span>
+
+              <span class="text-[9px] text-[#8C6D40] bg-[#FAF5ED] px-1.5 py-0.5 rounded font-bold mt-1 border border-[#EADBCA] whitespace-nowrap block">
+                钛金铁公鸡
+              </span>
+
+              <p class="font-din text-sm font-black text-[#E34A32] mt-1">¥850.00</p>
+            </div>
+
+            <!-- Rank 3: 王五 ¥610.00 - 穷鬼套餐品鉴官 -->
+            <div class="bg-[#FAF7F2] rounded-2xl p-2.5 border border-[#EADBCA]/70 text-center flex flex-col items-center">
+              
+              <!-- 头像区域 -->
+              <div class="relative w-12 h-12 mb-1 flex items-center justify-center">
+                <!-- 青铜月桂 -->
+                <svg viewBox="0 0 48 48" fill="none" class="absolute inset-0 w-full h-full pointer-events-none">
+                  <circle cx="24" cy="24" r="22" stroke="#A67E48" stroke-width="1" stroke-dasharray="2 3" opacity="0.7" />
+                  <path d="M8 22 C5 17, 10 13, 13 18" stroke="#A67E48" stroke-width="1.2" stroke-linecap="round" />
+                  <path d="M48 22 C52 17, 44 13, 40 18" stroke="#A67E48" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+                <div class="w-10 h-10 rounded-full bg-[#FFFFFF] flex items-center justify-center font-bold text-xs text-[#707D76] border border-[#EADBCA] shadow-2xs">
+                  王五
+                </div>
+                <span class="absolute -bottom-1 -right-1 w-4.5 h-4.5 bg-[#C99C6A] text-white rounded-full text-[9px] font-bold flex items-center justify-center shadow-xs">
+                  3
+                </span>
+              </div>
+
+              <span class="text-xs font-bold text-[#1C2621] block truncate max-w-full">王五</span>
+
+              <span class="text-[9px] text-[#8C6D40] bg-[#FAF5ED] px-1.5 py-0.5 rounded font-bold mt-1 border border-[#EADBCA] whitespace-nowrap block">
+                品鉴官
+              </span>
+
+              <p class="font-din text-xs font-bold text-[#E34A32] mt-1">¥610.00</p>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Ranking List Card: 民间抠门高手 (4 - 10) -->
+        <section class="bg-[#FFFFFF] rounded-[24px] p-5 shadow-subtleCard border border-[#F3EDE2] mb-6">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b border-[#F6EFE4]">
+            <h2 class="text-xs font-bold text-[#1C2621] flex items-center gap-1">
+              <span>民间抠门高手 (4 - 10)</span>
+              <span class="text-[10px] text-[#A67E48]">🧮</span>
+            </h2>
+            <span class="text-[10px] text-[#707D76]">战况焦灼 · 谁都不肯花钱</span>
+          </div>
+
+          <div class="space-y-3">
+            
+            <!-- Rank 4 -->
+            <div class="flex items-center justify-between py-1 border-b border-[#F8F2E8]">
+              <div class="flex items-center gap-2.5">
+                <span class="w-4 text-center font-din text-xs font-bold text-[#707D76]">4</span>
+                <div class="w-8 h-8 rounded-full bg-[#FAF7F2] flex items-center justify-center font-bold text-xs text-[#707D76] border border-[#EADBCA]/60">
+                  赵六
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-[#1C2621]">赵六 · 临期清道夫</span>
+                  </div>
+                  <span class="text-[9px] text-[#707D76]">“专蹲超市晚八点打折黄标”</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="font-din text-xs font-bold text-[#345942] bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">+¥520.00</span>
+              </div>
+            </div>
+
+            <!-- Rank 5 -->
+            <div class="flex items-center justify-between py-1 border-b border-[#F8F2E8]">
+              <div class="flex items-center gap-2.5">
+                <span class="w-4 text-center font-din text-xs font-bold text-[#707D76]">5</span>
+                <div class="w-8 h-8 rounded-full bg-[#FAF7F2] flex items-center justify-center font-bold text-xs text-[#707D76] border border-[#EADBCA]/60">
+                  钱七
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-[#1C2621]">钱七 · 纸箱狂魔</span>
+                  </div>
+                  <span class="text-[9px] text-[#707D76]">“攒了80个快递纸箱卖废品”</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="font-din text-xs font-bold text-[#345942] bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">+¥410.00</span>
+              </div>
+            </div>
+
+            <!-- Rank 6 -->
+            <div class="flex items-center justify-between py-1 border-b border-[#F8F2E8]">
+              <div class="flex items-center gap-2.5">
+                <span class="w-4 text-center font-din text-xs font-bold text-[#707D76]">6</span>
+                <div class="w-8 h-8 rounded-full bg-[#FAF7F2] flex items-center justify-center font-bold text-xs text-[#707D76] border border-[#EADBCA]/60">
+                  孙八
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-[#1C2621]">孙八 · 蹭网战神</span>
+                  </div>
+                  <span class="text-[9px] text-[#707D76]">“蹭隔壁WiFi连了整整三年”</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="font-din text-xs font-bold text-[#345942] bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">+¥360.00</span>
+              </div>
+            </div>
+
+            <!-- Rank 7 -->
+            <div class="flex items-center justify-between py-1 border-b border-[#F8F2E8]">
+              <div class="flex items-center gap-2.5">
+                <span class="w-4 text-center font-din text-xs font-bold text-[#707D76]">7</span>
+                <div class="w-8 h-8 rounded-full bg-[#FAF7F2] flex items-center justify-center font-bold text-xs text-[#707D76] border border-[#EADBCA]/60">
+                  周九
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-[#1C2621]">周九 · 砍刀教皇</span>
+                  </div>
+                  <span class="text-[9px] text-[#707D76]">“拼多多砍一刀终身荣誉会长”</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="font-din text-xs font-bold text-[#345942] bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">+¥310.00</span>
+              </div>
+            </div>
+
+            <!-- Rank 8 -->
+            <div class="flex items-center justify-between py-1 border-b border-[#F8F2E8]">
+              <div class="flex items-center gap-2.5">
+                <span class="w-4 text-center font-din text-xs font-bold text-[#707D76]">8</span>
+                <div class="w-8 h-8 rounded-full bg-[#FAF7F2] flex items-center justify-center font-bold text-xs text-[#707D76] border border-[#EADBCA]/60">
+                  吴十
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-[#1C2621]">吴十 · 手机壳传家宝</span>
+                  </div>
+                  <span class="text-[9px] text-[#707D76]">“发黄透明壳贴胶布硬扛”</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="font-din text-xs font-bold text-[#345942] bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">+¥250.00</span>
+              </div>
+            </div>
+
+            <!-- Rank 9 -->
+            <div class="flex items-center justify-between py-1 border-b border-[#F8F2E8]">
+              <div class="flex items-center gap-2.5">
+                <span class="w-4 text-center font-din text-xs font-bold text-[#707D76]">9</span>
+                <div class="w-8 h-8 rounded-full bg-[#FAF7F2] flex items-center justify-center font-bold text-xs text-[#707D76] border border-[#EADBCA]/60">
+                  郑十一
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-[#1C2621]">郑十一 · 试吃饱腹仙人</span>
+                  </div>
+                  <span class="text-[9px] text-[#707D76]">“超市试吃区走一圈吃饱”</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="font-din text-xs font-bold text-[#345942] bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">+¥180.00</span>
+              </div>
+            </div>
+
+            <!-- Rank 10 -->
+            <div class="flex items-center justify-between py-1">
+              <div class="flex items-center gap-2.5">
+                <span class="w-4 text-center font-din text-xs font-bold text-[#707D76]">10</span>
+                <div class="w-8 h-8 rounded-full bg-[#FAF7F2] flex items-center justify-center font-bold text-xs text-[#707D76] border border-[#EADBCA]/60">
+                  王十二
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-[#1C2621]">王十二 · 塑料袋收藏家</span>
+                  </div>
+                  <span class="text-[9px] text-[#707D76]">“买菜袋子存五百个当垃圾袋”</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="font-din text-xs font-bold text-[#345942] bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">+¥120.00</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ==================== 4. 个人中心页 (Personal Profile Page - LOEWE Botanical Masterpiece) ==================== -->
+    <div id="view-profile" class="page-view flex-1 flex flex-col relative z-10 hidden">
+      
+      <!-- Header: 植物手稿个人档案 -->
+      <header class="px-6 pt-7 pb-2 relative z-10">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold text-[#A67E48] tracking-widest bg-[#FAF5ED] px-2 py-0.5 rounded border border-[#EADBCA] block mb-0.5 w-fit">
+              植物手稿
+            </span>
+            <h1 class="text-lg font-bold tracking-wide text-[#1C2621] flex items-center gap-1.5">
+              <span>个人中心 · 自律手稿</span>
+              <span class="text-xs text-[#8C6D40]">📜</span>
+            </h1>
+          </div>
+          <span class="text-[10px] text-[#3C624B] bg-[#F0F5F2] px-2.5 py-1 rounded-full border border-[#DCE8E1] font-medium">
+            ✿ 静心笃志
+          </span>
+        </div>
+      </header>
+
+      <div class="flex-1 px-6 pt-2 overflow-y-auto hide-scrollbar relative z-10">
+        
+        <!-- Profile Section: User avatar, bold user name, subtext -->
+        <section class="bg-[#FFFFFF] rounded-[28px] p-5 shadow-subtleCard mb-3.5 border border-[#F3EDE2] relative overflow-hidden">
+          
+          <div class="flex items-center gap-3.5">
+            <!-- 头像采用统一复古手绘蔬菜/番茄标本艺术托底，搭配经典月桂饰圈 -->
+            <div class="relative w-14 h-14 shrink-0">
+              <svg viewBox="0 0 60 60" fill="none" class="absolute inset-0 w-full h-full pointer-events-none">
+                <circle cx="30" cy="30" r="27" stroke="#A67E48" stroke-width="0.8" stroke-dasharray="2 2" />
+                <path d="M12 28 C8 22, 14 18, 18 24" stroke="#8C6D40" stroke-width="1.2" />
+                <path d="M48 28 C52 22, 46 18, 42 24" stroke="#8C6D40" stroke-width="1.2" />
+              </svg>
+              <div class="w-12 h-12 rounded-full overflow-hidden border border-[#EADBCA] mx-auto mt-1 shadow-2xs bg-[#FAF7F2]">
+                <img src="/assets/loewe_tomato_banner.jpg" alt="植物学者复古手绘头像" class="w-full h-full object-cover object-center scale-110" referrerPolicy="no-referrer" />
+              </div>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-bold text-[#1C2621]">自律学者</h2>
+                <span class="text-[9px] text-[#8C6D40] bg-[#FAF5ED] px-1.5 py-0.2 rounded border border-[#EADBCA]">
+                  笃定守心
+                </span>
+              </div>
+              <p class="text-xs text-[#707D76] mt-0.5">已加入抠门计划 42 天 · 笃定心志</p>
+            </div>
+          </div>
+
+          <!-- 个人省钱金额展台 -->
+          <div class="pt-3.5 border-t border-[#F5EFE4] mt-4 flex items-center justify-between">
+            <div>
+              <span class="text-xs text-[#707D76] flex items-center gap-1.5">
+                <span>我省下的钱</span>
+                <span class="text-[9px] text-[#345942] bg-[#EBF4EE] px-1.5 py-0.2 rounded border border-[#D5E8DC] font-medium">自律守住</span>
+              </span>
+              <p class="font-din text-2xl font-bold text-[#E34A32] mt-0.5">¥3,420.00</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-[#8C6D40] bg-[#FAF5ED] px-2.5 py-1 rounded-full border border-[#EADBCA]">
+                42 天心志笃定
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 勋章获取规则与说明入口 (Badge Unlock Guidelines Banner) -->
+        <div onclick="openBadgeRulesModal()" class="bg-[#FFFFFF] hover:bg-[#FAF7F2] rounded-2xl p-3.5 mb-3.5 border border-[#EADBCA] flex items-center justify-between cursor-pointer active:scale-[0.99] transition-all shadow-subtleCard">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-[#FAF5ED] border border-[#EADBCA] flex items-center justify-center text-base shrink-0 shadow-2xs">
+              📜
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h3 class="text-xs font-bold text-[#1C2621]">勋章获取规则与逻辑指南</h3>
+                <span class="text-[9px] font-bold text-[#E34A32] bg-[#FAF2F0] px-1.5 py-0.2 rounded border border-[#F6DCD8]">
+                  点亮说明
+                </span>
+              </div>
+              <p class="text-[11px] text-[#707D76] mt-0.5">【克制之花】与【心如止水】如何得到？查看获取条件</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-0.5 text-xs font-bold text-[#8C6D40]">
+            <span>指南</span>
+            <svg viewBox="0 0 16 16" fill="none" class="w-3.5 h-3.5 stroke-current" stroke-width="2" stroke-linecap="round">
+              <path d="M6 3 L11 8 L6 13" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- ==================== 成就图鉴勋章展台 (可交互动态植物发芽开花动效) ==================== -->
+        <section class="bg-[#FFFFFF] rounded-[24px] p-5 shadow-subtleCard mb-4 border border-[#F3EDE2] relative">
+          
+          <div class="flex justify-between items-center mb-3 pb-2 border-b border-[#F6EFE4]">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h2 class="text-xs font-bold text-[#1C2621] tracking-wider">成就图鉴 · 植物勋章</h2>
+                <span class="text-[9px] text-[#3C624B] bg-[#EBF4EE] px-1.5 py-0.2 rounded font-medium inline-flex items-center gap-0.5">
+                  <svg viewBox="0 0 16 16" fill="currentColor" class="w-2.5 h-2.5">
+                    <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+                    <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
+                    <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+                  </svg>
+                  空灵微音效
+                </span>
+              </div>
+              <p class="text-[10px] text-[#707D76] mt-0.5">轻触勋章 · 聆听清晨露珠与草木舒展</p>
+            </div>
+            <span class="text-[10px] bg-[#EBF4EE] text-[#345942] px-2 py-0.5 rounded-full font-bold border border-[#D5E8DC]">
+              2 枚已点亮
+            </span>
+          </div>
+
+          <!-- 双勋章并列网格：核心勋章【克制之花】支持点击即时触发发芽开花 CSS 动效 -->
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            
+            <!-- 勋章 1：克制之花 (主交互勋章：点击触发植物生长动效) -->
+            <div id="badge-card-flower" onclick="triggerBadgeGrowth('profile')" class="bg-[#FAF7F2] hover:bg-[#F5EFEB] rounded-2xl p-3 border border-[#EADBCA] cursor-pointer flex flex-col items-center text-center transition-all duration-300 relative select-none active:scale-[0.98]">
+              
+              <!-- 顶部点缀微型植物标签 -->
+              <span class="text-[9px] font-bold text-[#E34A32] bg-white px-2 py-0.5 rounded-full border border-[#EADBCA] shadow-2xs mb-1">
+                点击唤醒
+              </span>
+
+              <!-- 植物生长动效 SVG 画布容器 (Pure CSS Driven Animation) -->
+              <div class="w-24 h-28 relative my-1 flex items-center justify-center">
+                <!-- 柔和微光月桂光环 -->
+                <svg viewBox="0 0 100 100" fill="none" class="absolute inset-0 w-full h-full pointer-events-none opacity-40">
+                  <circle cx="50" cy="50" r="46" stroke="#3C624B" stroke-width="0.8" stroke-dasharray="2 3" />
+                </svg>
+
+                <svg id="profile-plant-stage" viewBox="0 0 100 120" fill="none" class="plant-stage is-idle w-full h-full overflow-visible">
+                  <!-- 土壤弧线 (Soil Earth Arc) -->
+                  <path d="M18 106 Q50 110 82 106" stroke="#C4B49E" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2 2" />
+                  
+                  <!-- 盛开温润微光晕 (Flower Halo) -->
+                  <circle cx="50" cy="30" r="26" fill="#FCEFD2" class="p-halo" opacity="0" />
+
+                  <!-- 种子 (Seed) - 破土膨胀微动 -->
+                  <g class="p-seed">
+                    <ellipse cx="50" cy="105" rx="4.5" ry="3" fill="#8C6D40" stroke="#5A4222" stroke-width="0.8" />
+                    <ellipse cx="49" cy="104" rx="1.8" ry="1" fill="#D4A76A" opacity="0.8" />
+                  </g>
+
+                  <!-- 茎秆 (Stem) - stroke-dasharray 纯 CSS 缓动生长 -->
+                  <path d="M50 104 C48 85, 53 62, 50 32" stroke="#3C624B" stroke-width="2.2" stroke-linecap="round" fill="none" stroke-dasharray="160" class="p-stem" />
+
+                  <!-- 左侧嫩叶 (Left Leaf) - 舒展舒心 -->
+                  <g class="p-leaf-l" style="transform-origin: 50px 72px;">
+                    <path d="M50 72 C35 70, 24 58, 26 48 C36 50, 46 62, 50 72 Z" fill="#4B6E57" stroke="#2D4D39" stroke-width="0.8" />
+                    <path d="M50 72 Q36 60 28 50" stroke="#688F75" stroke-width="0.6" stroke-linecap="round" />
+                  </g>
+
+                  <!-- 右侧嫩叶 (Right Leaf) - 萌发舒展 -->
+                  <g class="p-leaf-r" style="transform-origin: 50px 58px;">
+                    <path d="M50 58 C65 56, 76 44, 74 34 C64 36, 54 48, 50 58 Z" fill="#3D5F4A" stroke="#203E2B" stroke-width="0.8" />
+                    <path d="M50 58 Q64 46 72 36" stroke="#5C856B" stroke-width="0.6" stroke-linecap="round" />
+                  </g>
+
+                  <!-- 花朵盛开绽放 (Flower Blossom) - 陶土与柿红温润花瓣 -->
+                  <g class="p-flower" style="transform-origin: 50px 30px;">
+                    <path d="M46 35 C48 32, 52 32, 54 35 C52 38, 48 38, 46 35 Z" fill="#3C624B" />
+                    <!-- 5 片细腻花瓣 -->
+                    <path d="M50 28 C45 16, 55 16, 50 28 Z" fill="#E34A32" stroke="#C43B25" stroke-width="0.6" opacity="0.9" />
+                    <path d="M48 29 C36 23, 40 13, 48 29 Z" fill="#ED7762" stroke="#C43B25" stroke-width="0.6" opacity="0.85" />
+                    <path d="M52 29 C60 13, 64 23, 52 29 Z" fill="#ED7762" stroke="#C43B25" stroke-width="0.6" opacity="0.85" />
+                    <path d="M47 31 C35 31, 39 41, 47 31 Z" fill="#F29380" stroke="#C43B25" stroke-width="0.6" opacity="0.85" />
+                    <path d="M53 31 C61 41, 65 31, 53 31 Z" fill="#F29380" stroke="#C43B25" stroke-width="0.6" opacity="0.85" />
+                    <!-- 柔金花蕊 -->
+                    <circle cx="50" cy="29" r="3.2" fill="#F4BD38" stroke="#BF8C1E" stroke-width="0.6" />
+                    <circle cx="50" cy="29" r="1.3" fill="#FFE27D" />
+                  </g>
+
+                  <!-- 晨露微光飘逸 (Dew Shimmer) -->
+                  <g class="p-dew" opacity="0">
+                    <circle cx="48" cy="18" r="1.2" fill="#EAB026" />
+                    <circle cx="56" cy="22" r="1" fill="#F4BD38" />
+                    <circle cx="36" cy="46" r="1" fill="#88B896" />
+                  </g>
+                </svg>
+              </div>
+
+              <h3 class="text-xs font-bold text-[#1C2621]">克制之花</h3>
+              <p class="text-[10px] text-[#707D76] mt-0.5">连续抠门 30 天</p>
+            </div>
+
+            <!-- 勋章 2：心如止水 (支持点击触发清泉水滴涟漪动态与水声效) -->
+            <div id="badge-card-water" onclick="triggerBadgeWater('profile')" class="bg-[#FAF7F2] hover:bg-[#F5EFEB] rounded-2xl p-3 border border-[#EADBCA] cursor-pointer flex flex-col items-center text-center transition-all duration-300 relative select-none active:scale-[0.98]">
+              <span id="badge-water-tag" class="text-[9px] font-bold text-[#345942] bg-white px-2 py-0.5 rounded-full border border-[#EADBCA] shadow-2xs mb-1">
+                点击涤心
+              </span>
+
+              <!-- 水滴与清泉涟漪 SVG 画布容器 (Pure CSS Driven Animation) -->
+              <div class="w-24 h-28 relative my-1 flex items-center justify-center">
+                <!-- 柔和微光水纹光环 -->
+                <svg viewBox="0 0 100 100" fill="none" class="absolute inset-0 w-full h-full pointer-events-none opacity-40">
+                  <circle cx="50" cy="50" r="46" stroke="#3C624B" stroke-width="0.8" stroke-dasharray="2 3" />
+                </svg>
+
+                <svg id="profile-water-stage" viewBox="0 0 100 120" fill="none" class="water-stage is-idle w-full h-full overflow-visible">
+                  <!-- 水面微光晕 (Water Glow Halo) -->
+                  <circle cx="50" cy="70" r="28" fill="#E2F0E7" class="w-halo" opacity="0" />
+
+                  <!-- 水波涟漪：多重同心波纹 (Water Ripples) -->
+                  <ellipse cx="50" cy="70" rx="34" ry="10" stroke="#8CB89B" stroke-width="1.2" stroke-dasharray="3 2" class="w-ripple-3" />
+                  <ellipse cx="50" cy="70" rx="24" ry="7" stroke="#5B8A6B" stroke-width="1.4" class="w-ripple-2" />
+                  <ellipse cx="50" cy="70" rx="14" ry="4.5" stroke="#3C624B" stroke-width="1.6" class="w-ripple-1" />
+
+                  <!-- 静心水草嫩芽 (Spring Water Sprout) -->
+                  <g class="w-sprout" style="transform-origin: 50px 70px;">
+                    <path d="M50 70 C47 52, 53 40, 50 25" stroke="#3C624B" stroke-width="2.2" stroke-linecap="round" />
+                    <path d="M50 48 C38 45, 30 35, 35 26 C43 30, 48 41, 50 48 Z" fill="#4B6E57" stroke="#2D4D39" stroke-width="0.8" />
+                    <path d="M50 38 C62 35, 70 25, 65 16 C57 20, 52 31, 50 38 Z" fill="#3D5F4A" stroke="#203E2B" stroke-width="0.8" />
+                  </g>
+
+                  <!-- 晶莹纯净水滴 (Falling Water Drop) -->
+                  <g class="w-drop" style="transform-origin: 50px 65px;">
+                    <path d="M50 58 C47.5 61, 45 64.5, 45 67 C45 69.8, 47.2 72, 50 72 C52.8 72, 55 69.8, 55 67 C55 64.5, 52.5 61, 50 58 Z" fill="#BCE0CC" stroke="#3C624B" stroke-width="0.9" />
+                    <circle cx="49" cy="66" r="1.2" fill="#FFFFFF" opacity="0.9" />
+                  </g>
+                </svg>
+              </div>
+
+              <h3 class="text-xs font-bold text-[#1C2621]">心如止水</h3>
+              <p class="text-[10px] text-[#707D76] mt-0.5">阻击冲动 24 次</p>
+            </div>
+
+          </div>
+
+          <!-- 生长动效状态与提示文案 (动态更新) -->
+          <div class="bg-[#FAF7F2] rounded-xl p-2.5 border border-[#EADBCA] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span id="growth-status-icon" class="text-xs">🌱</span>
+              <p id="growth-status-text" class="text-[11px] text-[#707D76]">
+                轻触上方“克制之花”或“心如止水”，聆听花开微风与清泉水滴
+              </p>
+            </div>
+            <button id="btn-replay-growth" onclick="replayActiveBadge('profile')" class="text-[10px] font-bold text-[#345942] bg-white px-2.5 py-1 rounded-lg border border-[#EADBCA] shadow-2xs hover:bg-[#F9F5EE] active:scale-95 transition-all">
+              再次唤醒
+            </button>
+          </div>
+
+        </section>
+
+        <!-- Menu List Card: Pure white rounded container with clear options: "成就图鉴徽章", "关于我们". Simple, clean chevron icons on the right -->
+        <section class="bg-[#FFFFFF] rounded-[24px] p-4 shadow-subtleCard border border-[#F3EDE2] mb-6">
+          <div class="space-y-1">
+            
+            <!-- 成就图鉴徽章 (点击打开全屏手帐图鉴与植物盛开手记) -->
+            <div onclick="openBadgeGrowthModal()" class="flex items-center justify-between p-3 rounded-2xl hover:bg-[#FAF7F2] cursor-pointer active:scale-[0.99] transition-all">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-[#1C2621]">成就图鉴徽章</span>
+                <span class="text-[10px] bg-[#EBF4EE] text-[#345942] px-2 py-0.5 rounded-full font-bold border border-[#D5E8DC]">2 枚已点亮</span>
+              </div>
+              <svg viewBox="0 0 16 16" fill="none" class="w-3.5 h-3.5 stroke-[#707D76]" stroke-width="1.8" stroke-linecap="round">
+                <path d="M6 3 L11 8 L6 13" />
+              </svg>
+            </div>
+
+            <!-- 关于我们 -->
+            <div onclick="alert('关于我们：复古植物手绘美学，极致克制留白与好友抠门互助应用。')" class="flex items-center justify-between p-3 rounded-2xl hover:bg-[#FAF7F2] cursor-pointer active:scale-[0.99] transition-all">
+              <span class="text-xs font-bold text-[#1C2621]">关于我们</span>
+              <svg viewBox="0 0 16 16" fill="none" class="w-3.5 h-3.5 stroke-[#707D76]" stroke-width="1.8" stroke-linecap="round">
+                <path d="M6 3 L11 8 L6 13" />
+              </svg>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ==================== 底部悬浮极简导航栏 ==================== -->
+    <nav class="fixed bottom-3 left-1/2 -translate-x-1/2 w-[90%] max-w-[390px] bg-white/95 backdrop-blur-md border border-[#EADBCA] rounded-full p-2 shadow-softNav flex justify-around items-center z-40">
+      <button onclick="navigateTab('home')" id="nav-home" class="nav-item flex-1 flex flex-col items-center py-1 transition-all text-[#E34A32]">
+        <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 stroke-current mb-0.5" stroke-width="1.8" stroke-linecap="round">
+          <path d="M12 21 C12 17, 10 13, 5 10 C10 10, 12 6, 12 3 C12 6, 14 10, 19 10 C14 13, 12 17, 12 21 Z" />
+        </svg>
+        <span class="text-[10px] font-bold">首页</span>
+      </button>
+
+      <button onclick="navigateTab('stats')" id="nav-stats" class="nav-item flex-1 flex flex-col items-center py-1 transition-all text-[#707D76]">
+        <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 stroke-current mb-0.5" stroke-width="1.8" stroke-linecap="round">
+          <path d="M18 20 L18 10" />
+          <path d="M12 20 L12 4" />
+          <path d="M6 20 L6 14" />
+        </svg>
+        <span class="text-[10px] font-bold">统计</span>
+      </button>
+
+      <button onclick="navigateTab('rank')" id="nav-rank" class="nav-item flex-1 flex flex-col items-center py-1 transition-all text-[#707D76]">
+        <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 stroke-current mb-0.5" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="9" r="6" />
+          <path d="M8.21 13.89 L7 21 L12 18 L17 21 L15.79 13.88" />
+        </svg>
+        <span class="text-[10px] font-bold">抠门排位</span>
+      </button>
+
+      <button onclick="navigateTab('profile')" id="nav-profile" class="nav-item flex-1 flex flex-col items-center py-1 transition-all text-[#707D76]">
+        <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 stroke-current mb-0.5" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="7" r="4" />
+          <path d="M5.5 21 C5.5 16.5 8.5 14 12 14 C15.5 14 18.5 16.5 18.5 21" />
+        </svg>
+        <span class="text-[10px] font-bold">我的</span>
+      </button>
+    </nav>
+
+    <!-- ==================== 5. 审批弹窗 (Approval Modal - Botanical Ribbon Interaction) ==================== -->
+    <!-- Dimmed warm background showing the clean home screen underneath -->
+    <div id="modal-court" class="fixed inset-0 z-50 bg-[#1C2621]/45 backdrop-blur-xs flex items-center justify-center p-5 hidden">
+      
+      <!-- Central pure-white rounded floating card. Clean header "购买申请" -->
+      <div id="approval-card-box" class="w-full max-w-sm bg-[#FFFFFF] rounded-[28px] p-6 shadow-2xl relative border border-[#EADBCA] z-10 overflow-hidden">
+        
+        <!-- 柔美丝带与果实飘逸粒子挂载画布 (NO fireworks, NO firework sparks) -->
+        <div id="burst-canvas-container" class="absolute inset-0 pointer-events-none z-30 overflow-hidden"></div>
+
+        <button onclick="closeCourtModal()" class="absolute right-4 top-4 w-7 h-7 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#707D76] text-xs hover:bg-[#F2EDE4]">
+          ✕
+        </button>
+
+        <!-- Clean Header "购买申请" -->
+        <div class="text-center mb-4 pb-2 border-b border-[#F6EFE4]">
+          <h3 class="text-base font-bold text-[#1C2621]">购买申请</h3>
+        </div>
+
+        <div class="space-y-3 mb-4 text-xs">
+          <!-- Applicant Info: "申请人：张三", large Terracotta Red amount "¥299.00" (DIN font) -->
+          <div class="bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#EADBCA] flex justify-between items-center">
+            <div>
+              <span class="text-[10px] text-[#707D76] block">申请人</span>
+              <p id="modal-applicant-name" class="text-sm font-bold text-[#1C2621] mt-0.5">申请人：张三</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-[#707D76] block">支出金额</span>
+              <span id="modal-applicant-price" class="font-din text-2xl font-bold text-[#E34A32]">¥299.00</span>
+            </div>
+          </div>
+
+          <!-- Statement Box: "现在的薄膜键盘敲得我手疼，买个红轴提升生产力..." -->
+          <div class="bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#EADBCA]">
+            <span class="text-[10px] text-[#707D76] block mb-1">申诉自述</span>
+            <p id="modal-applicant-statement" class="text-xs text-[#1C2621] italic leading-relaxed">
+              “现在的薄膜键盘敲得我手疼，买个红轴提升生产力...”
+            </p>
+          </div>
+
+          <!-- Opinion Input Placeholder: 审批理由必填 -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-bold text-[#707D76]">
+                审批理由 <span class="text-[#B55947] font-semibold">*必填</span>
+              </label>
+              <span id="review-error-tip" class="text-[10px] text-[#B55947] font-bold hidden flex items-center gap-0.5">
+                <span>⚠️</span> 请先填写理由
+              </span>
+            </div>
+            <textarea id="modal-review-input" rows="2" placeholder="请填写驳回或允许购买的理由..." class="w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-xl px-3.5 py-2 text-xs text-[#1C2621] focus:outline-none focus:border-[#B55947] transition-all resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- Action Buttons: Left Terracotta Red button "驳回申请"; Right Obsidian Black button "允许购买" -->
+        <div id="modal-decision-buttons" class="flex items-center gap-2 relative">
+          <!-- Left Terracotta Red button "驳回申请" -->
+          <button id="btn-reject-action" onclick="applyDecision('reject')" class="flex-1 bg-[#B55947] hover:bg-[#A14B3B] text-white py-3 rounded-xl font-bold text-xs shadow-softBtnRed active:scale-95 transition-transform flex items-center justify-center gap-1.5 border border-[#B55947]/30">
+            <svg viewBox="0 0 20 20" fill="none" class="w-3.5 h-3.5 stroke-white" stroke-width="1.8" stroke-linecap="round">
+              <rect x="3" y="13" width="14" height="4" rx="1" />
+              <path d="M10 13 L10 5 C10 3.5 8 3.5 8 3.5" />
+              <circle cx="10" cy="4" r="2" />
+            </svg>
+            驳回申请
+          </button>
+
+          <!-- Right Obsidian Black button "允许购买" -->
+          <button id="btn-approve-action" onclick="applyDecision('approve')" class="flex-1 bg-[#181D1B] hover:bg-[#2A312F] text-white py-3 rounded-xl font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-1.5 border border-[#181D1B]">
+            <svg viewBox="0 0 20 20" fill="none" class="w-3.5 h-3.5 stroke-white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 10 8 14 16 6" />
+            </svg>
+            允许购买
+          </button>
+        </div>
+
+        <!-- 盖章结果呈现 -->
+        <div id="modal-stamp-result" class="hidden text-center pt-2">
+          <div id="stamp-seal" class="stamp-animate inline-block border-4 border-double px-4 py-2 rounded-xl text-center mb-2">
+            <span id="stamp-title" class="text-sm font-black tracking-widest block">驳回申请 · 守住钱袋</span>
+            <span id="stamp-sub-text" class="text-xs font-bold block mt-0.5">守住 ¥299.00</span>
+          </div>
+
+          <div class="bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBCA] text-left mt-2">
+            <p id="stamp-summary" class="text-xs font-bold text-[#B55947]">已完成审批</p>
+            <p id="stamp-opinion-text" class="text-[11px] text-[#707D76] mt-1">审批理由：“现在的还能再坚持用三年！”</p>
+          </div>
+
+          <button onclick="closeCourtModal()" class="w-full mt-3 bg-[#181D1B] text-white py-2.5 rounded-xl font-bold text-xs">
+            确认归档
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== 快捷记账弹窗 ==================== -->
+    <div id="modal-quick-save" class="fixed inset-0 z-50 bg-[#1C2621]/45 backdrop-blur-xs flex items-end justify-center hidden">
+      <div class="w-full max-w-md bg-[#FAF7F2] rounded-t-[32px] p-6 shadow-2xl relative border-t border-[#EADBCA]">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-base font-bold text-[#1C2621]">
+            记一笔克制瞬间
+          </h3>
+          <button onclick="closeQuickSaveModal()" class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#707D76] text-xs shadow-xs">
+            ✕
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 border border-[#F3EDE2] mb-4 space-y-3 shadow-sm">
+          <div>
+            <label class="block text-xs font-bold text-[#707D76] mb-1">差点买下物品</label>
+            <input id="quick-input-title" type="text" placeholder="例如：一杯多肉葡萄" class="w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-xl px-3.5 py-2.5 text-sm text-[#1C2621] focus:outline-none focus:border-[#B55947]">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#707D76] mb-1">省下金额 (¥)</label>
+            <input id="quick-input-amount" type="number" placeholder="28.00" class="font-din w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-xl px-3.5 py-2.5 text-base font-bold text-[#B55947] focus:outline-none focus:border-[#B55947]">
+          </div>
+        </div>
+
+        <button onclick="confirmQuickSave()" class="w-full bg-[#B55947] hover:bg-[#A14B3B] text-white rounded-2xl py-3.5 font-bold shadow-softBtnRed active:scale-95 transition-transform">
+          守住这笔钱 · 存入金库
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== 发起审批弹窗 ==================== -->
+    <div id="modal-apply-create" class="fixed inset-0 z-50 bg-[#1C2621]/45 backdrop-blur-xs flex items-end justify-center hidden">
+      <div class="w-full max-w-md bg-[#FAF7F2] rounded-t-[32px] p-6 shadow-2xl relative border-t border-[#EADBCA]">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-base font-bold text-[#1C2621]">
+            发起购买审批
+          </h3>
+          <button onclick="closeApplyModal()" class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#707D76] text-xs shadow-xs">
+            ✕
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 border border-[#F3EDE2] mb-4 space-y-3 shadow-sm">
+          <div>
+            <label class="block text-xs font-bold text-[#707D76] mb-1">拟购物品</label>
+            <input id="apply-input-item" type="text" placeholder="例如：红轴机械键盘" class="w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-xl px-3.5 py-2.5 text-sm text-[#1C2621] focus:outline-none focus:border-[#B55947]">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#707D76] mb-1">预算花费 (¥)</label>
+            <input id="apply-input-cost" type="number" placeholder="299.00" class="font-din w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-xl px-3.5 py-2.5 text-base font-bold text-[#1C2621] focus:outline-none focus:border-[#B55947]">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#707D76] mb-1">购买理由</label>
+            <textarea id="apply-input-note" rows="3" placeholder="写下非买不可的理由..." class="w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-xl px-3.5 py-2.5 text-xs text-[#1C2621] focus:outline-none focus:border-[#B55947] resize-none"></textarea>
+          </div>
+        </div>
+
+        <button onclick="confirmSubmitApply()" class="w-full bg-[#181D1B] hover:bg-[#2A312F] text-white rounded-2xl py-3.5 font-bold active:scale-95 transition-transform">
+          递交审批 · 好友公审
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== 成就图鉴 · 植物成长手账全屏弹窗 ==================== -->
+    <div id="modal-badge-detail" class="fixed inset-0 z-50 bg-[#1C2621]/45 backdrop-blur-xs flex items-center justify-center p-5 hidden">
+      <div class="w-full max-w-sm bg-[#FFFFFF] rounded-[32px] p-6 shadow-2xl relative border border-[#EADBCA] z-10 overflow-hidden text-center">
+        
+        <!-- 关闭按钮 -->
+        <button onclick="closeBadgeGrowthModal()" class="absolute right-4 top-4 w-7 h-7 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#707D76] text-xs hover:bg-[#F2EDE4]">
+          ✕
+        </button>
+
+        <!-- 标签切换与勋章手账图鉴头部 -->
+        <div class="mb-3">
+          <div class="flex items-center justify-center gap-1.5 p-1 bg-[#FAF7F2] rounded-full border border-[#EADBCA] max-w-[210px] mx-auto mb-2.5">
+            <button id="modal-tab-flower" onclick="switchModalBadgeTab('flower')" class="flex-1 py-1 px-2.5 rounded-full text-[11px] font-bold transition-all bg-[#E34A32] text-white shadow-2xs">
+              🌸 克制之花
+            </button>
+            <button id="modal-tab-water" onclick="switchModalBadgeTab('water')" class="flex-1 py-1 px-2.5 rounded-full text-[11px] font-bold transition-all text-[#707D76] hover:text-[#1C2621]">
+              💧 心如止水
+            </button>
+          </div>
+
+          <div id="modal-badge-header">
+            <span id="modal-badge-tag" class="text-[10px] text-[#E34A32] font-bold bg-[#FAF2F0] px-2.5 py-0.5 rounded-full border border-[#F6DCD8]">
+              复古手账图鉴
+            </span>
+            <h3 id="modal-badge-title" class="text-base font-bold text-[#1C2621] mt-1.5">克制之花 · 成长手记</h3>
+            <p id="modal-badge-sub" class="text-[11px] text-[#707D76] mt-0.5">连续坚持 30 天理智消费之具象</p>
+          </div>
+        </div>
+
+        <!-- 核心大号手绘动效舞台容器 (Pure CSS Driven Animation for Flower & Water) -->
+        <div class="w-44 h-52 relative mx-auto my-2 flex items-center justify-center bg-[#FAF7F2] rounded-3xl border border-[#EADBCA]/80 p-2 shadow-inner">
+          
+          <!-- 月桂/水波底纹环绕 -->
+          <svg viewBox="0 0 100 100" fill="none" class="absolute inset-0 w-full h-full pointer-events-none opacity-30">
+            <circle cx="50" cy="50" r="46" stroke="#3C624B" stroke-width="0.8" stroke-dasharray="2 3" />
+            <path d="M15 50 C10 40, 20 30, 25 35" stroke="#4B6E57" stroke-width="1" />
+            <path d="M85 50 C90 40, 80 30, 75 35" stroke="#4B6E57" stroke-width="1" />
+          </svg>
+
+          <!-- 1. 大号植物 SVG 舞台 (克制之花) -->
+          <svg id="modal-plant-stage" viewBox="0 0 100 120" fill="none" class="plant-stage is-idle w-full h-full overflow-visible">
+            <!-- 土壤弧线 -->
+            <path d="M15 106 Q50 110 85 106" stroke="#C4B49E" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2 2" />
+            
+            <!-- 盛开温润微光晕 -->
+            <circle cx="50" cy="30" r="28" fill="#FCEFD2" class="p-halo" opacity="0" />
+
+            <!-- 种子 -->
+            <g class="p-seed">
+              <ellipse cx="50" cy="105" rx="5" ry="3.2" fill="#8C6D40" stroke="#5A4222" stroke-width="0.8" />
+              <ellipse cx="49" cy="104" rx="2" ry="1.1" fill="#D4A76A" opacity="0.8" />
+            </g>
+
+            <!-- 茎秆 -->
+            <path d="M50 104 C48 85, 53 62, 50 32" stroke="#3C624B" stroke-width="2.4" stroke-linecap="round" fill="none" stroke-dasharray="160" class="p-stem" />
+
+            <!-- 左侧嫩叶 -->
+            <g class="p-leaf-l" style="transform-origin: 50px 72px;">
+              <path d="M50 72 C34 70, 22 58, 25 47 C35 49, 45 61, 50 72 Z" fill="#4B6E57" stroke="#2D4D39" stroke-width="0.9" />
+              <path d="M50 72 Q35 60 27 49" stroke="#688F75" stroke-width="0.6" stroke-linecap="round" />
+            </g>
+
+            <!-- 右侧嫩叶 -->
+            <g class="p-leaf-r" style="transform-origin: 50px 58px;">
+              <path d="M50 58 C66 56, 78 44, 75 33 C65 35, 55 47, 50 58 Z" fill="#3D5F4A" stroke="#203E2B" stroke-width="0.9" />
+              <path d="M50 58 Q65 45 73 35" stroke="#5C856B" stroke-width="0.6" stroke-linecap="round" />
+            </g>
+
+            <!-- 花朵盛开绽放 -->
+            <g class="p-flower" style="transform-origin: 50px 30px;">
+              <path d="M46 35 C48 32, 52 32, 54 35 C52 38, 48 38, 46 35 Z" fill="#3C624B" />
+              <path d="M50 28 C45 16, 55 16, 50 28 Z" fill="#E34A32" stroke="#C43B25" stroke-width="0.6" opacity="0.95" />
+              <path d="M48 29 C36 23, 40 13, 48 29 Z" fill="#ED7762" stroke="#C43B25" stroke-width="0.6" opacity="0.88" />
+              <path d="M52 29 C60 13, 64 23, 52 29 Z" fill="#ED7762" stroke="#C43B25" stroke-width="0.6" opacity="0.88" />
+              <path d="M47 31 C35 31, 39 41, 47 31 Z" fill="#F29380" stroke="#C43B25" stroke-width="0.6" opacity="0.88" />
+              <path d="M53 31 C61 41, 65 31, 53 31 Z" fill="#F29380" stroke="#C43B25" stroke-width="0.6" opacity="0.88" />
+              <circle cx="50" cy="29" r="3.5" fill="#F4BD38" stroke="#BF8C1E" stroke-width="0.6" />
+              <circle cx="50" cy="29" r="1.4" fill="#FFE27D" />
+            </g>
+
+            <!-- 晨露微光飘逸 -->
+            <g class="p-dew" opacity="0">
+              <circle cx="48" cy="18" r="1.4" fill="#EAB026" />
+              <circle cx="56" cy="22" r="1.2" fill="#F4BD38" />
+              <circle cx="36" cy="46" r="1.2" fill="#88B896" />
+            </g>
+          </svg>
+
+          <!-- 2. 大号水滴与涟漪 SVG 舞台 (心如止水) -->
+          <svg id="modal-water-stage" viewBox="0 0 100 120" fill="none" class="water-stage is-idle w-full h-full overflow-visible hidden">
+            <!-- 水面微光晕 -->
+            <circle cx="50" cy="70" r="34" fill="#E2F0E7" class="w-halo" opacity="0" />
+
+            <!-- 水波同心涟漪 -->
+            <ellipse cx="50" cy="70" rx="38" ry="11" stroke="#8CB89B" stroke-width="1.3" stroke-dasharray="3 2" class="w-ripple-3" />
+            <ellipse cx="50" cy="70" rx="27" ry="8" stroke="#5B8A6B" stroke-width="1.5" class="w-ripple-2" />
+            <ellipse cx="50" cy="70" rx="16" ry="5" stroke="#3C624B" stroke-width="1.8" class="w-ripple-1" />
+
+            <!-- 静心水草嫩芽 -->
+            <g class="w-sprout" style="transform-origin: 50px 70px;">
+              <path d="M50 70 C47 52, 53 40, 50 25" stroke="#3C624B" stroke-width="2.4" stroke-linecap="round" />
+              <path d="M50 48 C36 45, 26 34, 32 24 C41 28, 47 40, 50 48 Z" fill="#4B6E57" stroke="#2D4D39" stroke-width="0.9" />
+              <path d="M50 38 C64 35, 74 24, 68 14 C59 18, 53 30, 50 38 Z" fill="#3D5F4A" stroke="#203E2B" stroke-width="0.9" />
+            </g>
+
+            <!-- 晶莹纯净水滴 -->
+            <g class="w-drop" style="transform-origin: 50px 65px;">
+              <path d="M50 56 C47 59.5, 44 63.5, 44 66.5 C44 69.8, 46.7 72.5, 50 72.5 C53.3 72.5, 56 69.8, 56 66.5 C56 63.5, 53 59.5, 50 56 Z" fill="#BCE0CC" stroke="#3C624B" stroke-width="1" />
+              <circle cx="48.5" cy="65.5" r="1.3" fill="#FFFFFF" opacity="0.9" />
+            </g>
+          </svg>
+        </div>
+
+        <!-- 动效三段节拍脉络指示器 -->
+        <div class="grid grid-cols-3 gap-1.5 my-2.5 text-center">
+          <div id="step-node-1" class="py-1 px-1.5 rounded-lg bg-[#FAF7F2] border border-[#EADBCA] text-[10px] text-[#707D76]">
+            ① 种子破土
+          </div>
+          <div id="step-node-2" class="py-1 px-1.5 rounded-lg bg-[#FAF7F2] border border-[#EADBCA] text-[10px] text-[#707D76]">
+            ② 舒叶展枝
+          </div>
+          <div id="step-node-3" class="py-1 px-1.5 rounded-lg bg-[#FAF7F2] border border-[#EADBCA] text-[10px] text-[#707D76]">
+            ③ 繁花初绽
+          </div>
+        </div>
+
+        <!-- 抒情手账格言 -->
+        <div class="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EADBCA] text-left mb-4">
+          <p id="modal-growth-desc" class="text-xs text-[#1C2621] italic leading-relaxed">
+            “每一次对冲动消费的克制，都是对理想生活的一次温润浇灌。克制之花，由心而生。”
+          </p>
+        </div>
+
+        <!-- 底部操作按钮 -->
+        <div class="flex items-center gap-2">
+          <button id="btn-modal-trigger-action" onclick="triggerActiveBadgeModal()" class="flex-1 bg-[#E34A32] hover:bg-[#D13F27] text-white py-3 rounded-xl font-bold text-xs shadow-softBtnRed active:scale-95 transition-transform flex items-center justify-center gap-1.5 border border-[#F27763]/25">
+            <svg id="modal-action-icon" viewBox="0 0 20 20" fill="none" class="w-3.5 h-3.5 stroke-white" stroke-width="1.8" stroke-linecap="round">
+              <path d="M10 2 C10 2, 4 9, 4 13 C4 16.3 6.7 19 10 19 C13.3 19 16 16.3 16 13 C16 9, 10 2, 10 2 Z" fill="white" fill-opacity="0.2" />
+            </svg>
+            <span id="modal-action-label">再次浇灌唤醒</span>
+          </button>
+          <button onclick="closeBadgeGrowthModal()" class="w-24 bg-[#181D1B] hover:bg-[#2A312F] text-white py-3 rounded-xl font-bold text-xs active:scale-95 transition-transform">
+            收起图鉴
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== 记账成功庆典弹窗 (放彩带与放烟花交互) ==================== -->
+    <div id="modal-save-celebrate" class="fixed inset-0 z-[60] bg-[#1C2621]/45 backdrop-blur-xs flex items-center justify-center p-5 hidden select-none" onclick="handleCelebrateBackdropClick(event)">
+      
+      <!-- 彩带与烟花动态粒子承载层 -->
+      <div id="celebrate-particles-layer" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
+
+      <!-- 中央纯白/高定暖羊皮浮动卡片 -->
+      <div id="celebrate-card-box" class="w-full max-w-sm bg-[#FFFFFF] rounded-[32px] p-6 shadow-2xl relative border border-[#EADBCA] z-20 overflow-hidden text-center celebrate-card-enter">
+        
+        <!-- 背景微光金轮 -->
+        <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-[#FAF3E6] blur-xl pointer-events-none opacity-80"></div>
+
+        <!-- 顶部艺术小品：真实罗意威高定番茄与小飘带古典圆形徽章 -->
+        <div class="relative w-24 h-24 mx-auto mb-2.5 rounded-full overflow-hidden border-2 border-[#EADBCA] shadow-md bg-[#FAF7F2] flex items-center justify-center select-none">
+          <img src="/assets/loewe_tomato_banner.jpg" alt="抠门成就" class="w-full h-full object-cover object-center" referrerPolicy="no-referrer" />
+          <div class="absolute inset-0 rounded-full border border-white/50 pointer-events-none"></div>
+        </div>
+
+        <!-- 庆典标头 -->
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EBF4EE] border border-[#D5E8DC] text-[#345942] text-xs font-bold mb-2">
+          <span>🎉</span>
+          <span>阻击成功 · 守住冲动</span>
+        </div>
+
+        <h3 id="celebrate-item-title" class="text-xs text-[#707D76] font-medium">差点买下：一杯多肉葡萄</h3>
+
+        <!-- 大字守住金额 (DIN Font) -->
+        <div class="my-3 flex items-baseline justify-center gap-1">
+          <span class="text-2xl font-light text-[#E34A32]">+¥</span>
+          <span id="celebrate-amount-display" class="font-din text-4xl font-black text-[#E34A32] tracking-tight leading-none">28.00</span>
+        </div>
+
+        <!-- 暖意金句手账框 -->
+        <div class="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EADBCA] text-xs text-[#1C2621] leading-relaxed mb-4 text-left">
+          <p class="font-bold text-[#3C624B] flex items-center gap-1 mb-0.5">
+            <span>🌿</span> 恭喜！理智金库已安全入库
+          </p>
+          <p class="text-[11px] text-[#707D76] italic">
+            “物欲如风掠过，心若定水常清。省下的不仅是金钱，更是通向自律生活的笃定。”
+          </p>
+        </div>
+
+        <!-- 操作按钮与自动倒计时 -->
+        <button onclick="closeSaveCelebration()" class="w-full bg-[#E34A32] hover:bg-[#D13F27] text-white py-3.5 rounded-2xl font-bold text-xs shadow-softBtnRed active:scale-95 transition-all flex items-center justify-center gap-1.5 border border-[#F27763]/25">
+          <span>收下成就 · 存入金库</span>
+        </button>
+
+        <p class="text-[10px] text-[#707D76] mt-2.5">
+          轻触任意处或稍候自动返回 · 感受克制之喜
+        </p>
+
+      </div>
+    </div>
+
+    <!-- ==================== 分享给好友 / 邀请公审弹窗 (Share to Friends Modal) ==================== -->
+    <div id="modal-share-approval" class="fixed inset-0 z-50 bg-[#1C2621]/45 backdrop-blur-xs flex items-center justify-center p-5 hidden">
+      <div class="w-full max-w-sm bg-[#FFFFFF] rounded-[32px] p-6 shadow-2xl relative border border-[#EADBCA] z-10 overflow-hidden text-center">
+        
+        <!-- 关闭按钮 -->
+        <button onclick="closeShareApprovalModal()" class="absolute right-4 top-4 w-7 h-7 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#707D76] text-xs hover:bg-[#F2EDE4]">
+          ✕
+        </button>
+
+        <!-- 顶部徽标 -->
+        <div class="w-14 h-14 mx-auto mb-2 rounded-full bg-[#FAF5ED] border border-[#EADBCA] flex items-center justify-center text-2xl shadow-xs">
+          ⚖️
+        </div>
+
+        <span class="text-[10px] text-[#A67E48] font-bold bg-[#FAF5ED] px-2.5 py-0.5 rounded-full border border-[#EADBCA]">
+          审批已提交 · 等待好友裁决
+        </span>
+
+        <h3 class="text-base font-bold text-[#1C2621] mt-2">
+          已发起公审，快分享给好友把关
+        </h3>
+        <p class="text-[11px] text-[#707D76] mt-0.5">
+          让好友们替你投票，理性决定该不该拔草
+        </p>
+
+        <!-- 公审令卡片信笺 (Subpoena Certificate Ticket) -->
+        <div class="my-4 bg-[#FAF7F2] rounded-2xl p-4 border border-[#EADBCA] text-left relative overflow-hidden">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <span class="text-[10px] font-bold text-[#707D76]">拟购物品</span>
+              <h4 id="share-modal-item" class="text-sm font-bold text-[#1C2621] mt-0.5">红轴机械键盘</h4>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] font-bold text-[#707D76]">预算花费</span>
+              <p id="share-modal-cost" class="font-din text-base font-bold text-[#E34A32]">¥299.00</p>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-[#EADBCA]/80">
+            <span class="text-[10px] font-bold text-[#707D76]">拟购理由：</span>
+            <p id="share-modal-reason" class="text-xs text-[#1C2621] mt-0.5 italic leading-relaxed">
+              “现在的键盘有点卡手，想升级一下...”
+            </p>
+          </div>
+        </div>
+
+        <!-- 按钮：发送给好友 -->
+        <div class="mt-4">
+          <button id="btn-send-to-friends" onclick="sendToFriendsAction()" class="w-full bg-[#E34A32] hover:bg-[#D13F27] text-white py-3.5 rounded-2xl font-bold text-xs shadow-softBtnRed active:scale-95 transition-all flex items-center justify-center gap-2">
+            <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+              <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+            </svg>
+            <span id="btn-send-text">发送给好友</span>
+          </button>
+        </div>
+
+        <!-- 发送成功微提示 Toast -->
+        <div id="share-toast-copied" class="hidden mt-3 text-[11px] text-[#345942] bg-[#EBF4EE] border border-[#D5E8DC] py-2 px-3 rounded-xl font-bold transition-all">
+          ✓ 已生成公审令，已成功唤起或复制！直接发给好友即可
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== 勋章获取规则与逻辑说明全屏弹窗 (Badge Rules Guide Modal) ==================== -->
+    <div id="modal-badge-rules" class="fixed inset-0 z-50 bg-[#1C2621]/45 backdrop-blur-xs flex items-center justify-center p-5 hidden">
+      <div class="w-full max-w-sm bg-[#FFFFFF] rounded-[32px] p-6 shadow-2xl relative border border-[#EADBCA] z-10 overflow-hidden text-center max-h-[90vh] flex flex-col">
+        
+        <!-- 关闭按钮 -->
+        <button onclick="closeBadgeRulesModal()" class="absolute right-4 top-4 w-7 h-7 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#707D76] text-xs hover:bg-[#F2EDE4] z-20">
+          ✕
+        </button>
+
+        <!-- 标题 -->
+        <div class="mb-3 shrink-0">
+          <span class="text-[10px] text-[#A67E48] font-bold bg-[#FAF5ED] px-2.5 py-0.5 rounded-full border border-[#EADBCA]">
+            自律手稿 · 成就图鉴指南
+          </span>
+          <h3 class="text-base font-bold text-[#1C2621] mt-2">
+            勋章获取规则与点亮秘籍
+          </h3>
+          <p class="text-[11px] text-[#707D76] mt-0.5">
+            用克制守卫财富，让自律长成花朵
+          </p>
+        </div>
+
+        <!-- 规则卡片可滚动列表 -->
+        <div class="flex-1 overflow-y-auto hide-scrollbar space-y-3.5 text-left pr-0.5">
+          
+          <!-- 勋章 1: 克制之花 -->
+          <div class="bg-[#FAF7F2] rounded-2xl p-4 border border-[#EADBCA] relative">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🌸</span>
+                <div>
+                  <h4 class="text-xs font-bold text-[#1C2621]">克制之花勋章</h4>
+                  <span class="text-[9px] text-[#E34A32] font-bold bg-[#FAF2F0] px-1.5 py-0.2 rounded border border-[#F6DCD8]">成长型成就</span>
+                </div>
+              </div>
+              <span class="text-[10px] text-[#345942] font-bold bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">已点亮</span>
+            </div>
+
+            <div class="text-[11px] text-[#1C2621] space-y-1.5 leading-relaxed">
+              <div class="flex items-start gap-1.5">
+                <span class="text-[#E34A32] font-bold">●</span>
+                <p><span class="font-bold text-[#1C2621]">获取核心条件：</span>连续自律打卡坚持 <span class="font-bold text-[#E34A32]">30 天</span> 不破戒。</p>
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-[#3C624B] font-bold">●</span>
+                <div>
+                  <span class="font-bold text-[#1C2621]">三阶段生命蜕变：</span>
+                  <ul class="text-[10px] text-[#707D76] mt-1 space-y-1">
+                    <li>🌱 <span class="font-bold text-[#1C2621]">第 1 天·破土：</span>开启理智自律计划，播下一颗种子；</li>
+                    <li>🌿 <span class="font-bold text-[#1C2621]">第 15 天·舒枝：</span>枝叶向上拔节，沉静抵御冲动杂念；</li>
+                    <li>🌸 <span class="font-bold text-[#1C2621]">第 30 天·绽放：</span>繁花绚烂盛开，永久点亮金线植物勋章。</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="flex items-start gap-1.5 pt-1 border-t border-[#EADBCA]/60">
+                <span class="text-[#A67E48] font-bold">✦</span>
+                <p class="text-[10px] text-[#707D76]"><span class="font-bold text-[#1C2621]">专属特权：</span>轻触勋章随时唤醒 Web Audio 晨露滴落与植物抽枝盛开音效。</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 勋章 2: 心如止水 -->
+          <div class="bg-[#FAF7F2] rounded-2xl p-4 border border-[#EADBCA] relative">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🌊</span>
+                <div>
+                  <h4 class="text-xs font-bold text-[#1C2621]">心如止水勋章</h4>
+                  <span class="text-[9px] text-[#345942] font-bold bg-[#EBF4EE] px-1.5 py-0.2 rounded border border-[#D5E8DC]">静心型成就</span>
+                </div>
+              </div>
+              <span class="text-[10px] text-[#345942] font-bold bg-[#EBF4EE] px-2 py-0.5 rounded-full border border-[#D5E8DC]">已点亮</span>
+            </div>
+
+            <div class="text-[11px] text-[#1C2621] space-y-1.5 leading-relaxed">
+              <div class="flex items-start gap-1.5">
+                <span class="text-[#E34A32] font-bold">●</span>
+                <p><span class="font-bold text-[#1C2621]">获取核心条件：</span>累计成功阻击 <span class="font-bold text-[#E34A32]">24 笔</span> 冲动消费。</p>
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-[#3C624B] font-bold">●</span>
+                <div>
+                  <span class="font-bold text-[#1C2621]">两大阻击方式：</span>
+                  <ul class="text-[10px] text-[#707D76] mt-1 space-y-1">
+                    <li>🛡️ <span class="font-bold text-[#1C2621]">自我克制：</span>在首页点击“我忍住了，记一笔”，每省下一笔计 1 次；</li>
+                    <li>⚖️ <span class="font-bold text-[#1C2621]">好友公审：</span>在发起“想买”审批时，被好友理性劝退驳回，计 1 次。</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="flex items-start gap-1.5 pt-1 border-t border-[#EADBCA]/60">
+                <span class="text-[#A67E48] font-bold">✦</span>
+                <p class="text-[10px] text-[#707D76]"><span class="font-bold text-[#1C2621]">专属特权：</span>轻触可触发水纹静心微澜光环，象征物欲无扰、心如明镜。</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 自律心得贴士 -->
+          <div class="bg-[#FAF5ED] rounded-xl p-3 border border-[#EADBCA] text-[10px] text-[#8C6D40] leading-relaxed">
+            💡 <strong>小贴士：</strong>每次面临购物冲动，不妨先发起“想买审批”让好友投票冷却24小时，往往能省下大半冲动开销！
+          </div>
+
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="pt-3 mt-2 border-t border-[#EADBCA] shrink-0">
+          <button onclick="closeBadgeRulesModal()" class="w-full bg-[#181D1B] hover:bg-[#2A312F] text-white py-3 rounded-2xl font-bold text-xs active:scale-95 transition-all">
+            我明白了 · 笃定心志
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== 交互脚本 (严格纯正中文，零外部品牌，高贵克制) ==================== -->
+  <script>
+    let appState = {
+      currentTab: 'home',
+      weeklySaved: 128.00,
+      blockedCount: 6,
+      totalSaved: 1280.50,
+      isMoreOpen: false
+    };
+
+    // 页面切页 (维持极简清透的淡暖羊皮纸背景 #FAF7F2)
+    function navigateTab(tabKey) {
+      appState.currentTab = tabKey;
+      
+      document.querySelectorAll('.page-view').forEach(view => view.classList.add('hidden'));
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('text-[#E34A32]');
+        btn.classList.add('text-[#707D76]');
+      });
+
+      const targetView = document.getElementById(`view-${tabKey}`);
+      const targetNav = document.getElementById(`nav-${tabKey}`);
+
+      if (targetView) targetView.classList.remove('hidden');
+      if (targetNav) {
+        targetNav.classList.remove('text-[#707D76]');
+        targetNav.classList.add('text-[#E34A32]');
+      }
+    }
+
+    // 展开/收起更多最近记录 (Collapsed Bottom List: ∨ 查看更多)
+    function toggleMoreLogs() {
+      appState.isMoreOpen = !appState.isMoreOpen;
+      const moreList = document.getElementById('home-more-list');
+      const toggleTxt = document.getElementById('txt-toggle-more');
+
+      if (appState.isMoreOpen) {
+        moreList.classList.remove('hidden');
+        toggleTxt.innerText = '∧ 收起明细';
+      } else {
+        moreList.classList.add('hidden');
+        toggleTxt.innerText = '∨ 查看更多';
+      }
+    }
+
+    // ==================== 统计日历数据系统 (本周与本月日历视图) ====================
+    const statsCalendarSystem = {
+      currentPeriod: 'week',
+      selectedDayKey: '2026-09-21',
+      
+      // 本周 7 天数据 (9月15日 - 9月21日)
+      weekDays: [
+        {
+          key: '2026-09-15',
+          dayOfWeek: '周一',
+          dayNum: 15,
+          saved: 128.00,
+          approvals: 1,
+          logs: [
+            { type: 'save', title: '抵御外卖火锅冲动', amount: '+¥98.00' },
+            { type: 'save', title: '忍住打车改乘地铁', amount: '+¥30.00' },
+            { type: 'approval', title: '发起购买轻奢卫衣审批（好友公审驳回，成功守住）' }
+          ]
+        },
+        {
+          key: '2026-09-16',
+          dayOfWeek: '周二',
+          dayNum: 16,
+          saved: 45.00,
+          approvals: 0,
+          logs: [
+            { type: 'save', title: '自带办公室挂耳咖啡，未点现磨外送', amount: '+¥45.00' }
+          ]
+        },
+        {
+          key: '2026-09-17',
+          dayOfWeek: '周三',
+          dayNum: 17,
+          saved: 260.00,
+          approvals: 2,
+          logs: [
+            { type: 'save', title: '克制降噪耳机物欲冲动', amount: '+¥260.00' },
+            { type: 'approval', title: '发起无线蓝牙耳机审批（好友公审驳回）' },
+            { type: 'approval', title: '发起网红零食大礼包审批（理性撤回）' }
+          ]
+        },
+        {
+          key: '2026-09-18',
+          dayOfWeek: '周四',
+          dayNum: 18,
+          saved: 0.00,
+          approvals: 0,
+          logs: [
+            { type: 'peace', title: '当日心如止水，无多余非必要物欲支出，平稳自律' }
+          ]
+        },
+        {
+          key: '2026-09-19',
+          dayOfWeek: '周五',
+          dayNum: 19,
+          saved: 380.00,
+          approvals: 1,
+          logs: [
+            { type: 'save', title: '取消周五聚餐高消费，自备轻食晚餐', amount: '+¥180.00' },
+            { type: 'save', title: '克制冲动购入Switch卡带', amount: '+¥200.00' },
+            { type: 'approval', title: '发起Switch新游卡带审批（好友投票阻击）' }
+          ]
+        },
+        {
+          key: '2026-09-20',
+          dayOfWeek: '周六',
+          dayNum: 20,
+          saved: 168.50,
+          approvals: 1,
+          logs: [
+            { type: 'save', title: '忍住商场周末冲动鞋服', amount: '+¥168.50' },
+            { type: 'approval', title: '发起机械键盘公审令（好友把关中）' }
+          ]
+        },
+        {
+          key: '2026-09-21',
+          dayOfWeek: '周日',
+          dayNum: 21,
+          isToday: true,
+          saved: 299.00,
+          approvals: 1,
+          logs: [
+            { type: 'save', title: '忍住机械键盘冲动支出', amount: '+¥299.00' },
+            { type: 'approval', title: '发起红轴机械键盘审批（好友法庭把关中）' }
+          ]
+        }
+      ],
+
+      // 本月 30 天数据 (2026年9月，9月1日为周二)
+      monthDays: [],
+
+      init: function() {
+        this.generateMonthDays();
+        this.renderWeekly();
+        this.renderMonthly();
+        this.selectDay('2026-09-21');
+      },
+
+      generateMonthDays: function() {
+        const sampleLogs = [
+          { saved: 98, approvals: 1, logs: [{ type: 'save', title: '克制盲盒冲动', amount: '+¥98.00' }, { type: 'approval', title: '发起手办盲盒审批（驳回）' }] },
+          { saved: 150, approvals: 1, logs: [{ type: 'save', title: '自带健康减脂餐', amount: '+¥150.00' }] },
+          { saved: 0, approvals: 0, logs: [{ type: 'peace', title: '心如止水，无多余非理性消费' }] },
+          { saved: 210, approvals: 2, logs: [{ type: 'save', title: '守住美容仪冲动', amount: '+¥210.00' }, { type: 'approval', title: '发起美容仪审批（驳回）' }, { type: 'approval', title: '发起香薰蜡烛审批（撤回）' }] },
+          { saved: 340, approvals: 1, logs: [{ type: 'save', title: '阻击冲动秋季风衣', amount: '+¥340.00' }, { type: 'approval', title: '发起风衣审批（驳回）' }] },
+          { saved: 180, approvals: 1, logs: [{ type: 'save', title: '克制聚会买单冲动', amount: '+¥180.00' }] },
+          { saved: 65, approvals: 0, logs: [{ type: 'save', title: '忍住奶茶烘焙', amount: '+¥65.00' }] },
+          { saved: 220, approvals: 2, logs: [{ type: 'save', title: '抵御换新机壳配件', amount: '+¥220.00' }, { type: 'approval', title: '发起电竞鼠标审批（驳回）' }] },
+          { saved: 0, approvals: 0, logs: [{ type: 'peace', title: '今日心如止水，笃定克制' }] },
+          { saved: 135, approvals: 1, logs: [{ type: 'save', title: '克制夜宵烧烤冲动', amount: '+¥135.00' }] },
+          { saved: 420, approvals: 2, logs: [{ type: 'save', title: '阻击冲动报健身私教', amount: '+¥420.00' }, { type: 'approval', title: '发起私教课大额审批（驳回）' }] },
+          { saved: 290, approvals: 1, logs: [{ type: 'save', title: '取消冲动打折鞋靴', amount: '+¥290.00' }] },
+          { saved: 180, approvals: 1, logs: [{ type: 'save', title: '克制网红餐厅打卡', amount: '+¥180.00' }] },
+          { saved: 0, approvals: 0, logs: [{ type: 'peace', title: '生活简单素雅，物欲极低' }] }
+        ];
+
+        const days = [];
+        const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+        for (let i = 1; i <= 30; i++) {
+          const key = `2026-09-${i < 10 ? '0' + i : i}`;
+          const dateObj = new Date(2026, 8, i);
+          const dayOfWeek = dayNames[dateObj.getDay()];
+          const isToday = (i === 21);
+
+          const weekMatch = this.weekDays.find(w => w.dayNum === i);
+          if (weekMatch) {
+            days.push({ ...weekMatch });
+          } else {
+            const template = sampleLogs[(i - 1) % sampleLogs.length];
+            days.push({
+              key: key,
+              dayOfWeek: dayOfWeek,
+              dayNum: i,
+              isToday: isToday,
+              saved: template.saved,
+              approvals: template.approvals,
+              logs: template.logs
+            });
+          }
+        }
+        this.monthDays = days;
+      },
+
+      renderWeekly: function() {
+        const grid = document.getElementById('week-days-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        this.weekDays.forEach(day => {
+          const isSelected = day.key === this.selectedDayKey;
+          const card = document.createElement('div');
+          card.className = `py-2 px-0.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between items-center min-h-[92px] ${
+            isSelected
+              ? 'bg-[#FFFDF9] border-2 border-[#E34A32] shadow-xs ring-2 ring-[#E34A32]/15 scale-[1.02]'
+              : 'bg-[#FAF7F2] hover:bg-[#F5EFE6] border-[#EADBCA]/80'
+          }`;
+          card.onclick = () => statsCalendarSystem.selectDay(day.key);
+
+          card.innerHTML = `
+            <!-- 星期与日期球 -->
+            <div class="text-center w-full">
+              <span class="text-[10px] block leading-tight ${isSelected ? 'font-bold text-[#E34A32]' : 'text-[#707D76]'}">${day.dayOfWeek}</span>
+              <div class="w-5 h-5 mx-auto mt-0.5 rounded-full flex items-center justify-center text-xs font-din font-bold ${
+                day.isToday ? 'bg-[#E34A32] text-white shadow-xs' : (isSelected ? 'text-[#1C2621]' : 'text-[#1C2621]')
+              }">
+                ${day.dayNum}
+              </div>
+            </div>
+
+            <!-- 当天省下金额：字号清晰醒目，去除导致省略号的挤压样式，百分百完整呈现 -->
+            <div class="my-1 text-center w-full overflow-visible">
+              ${day.saved > 0 
+                ? `
+                  <span class="font-din text-xs sm:text-[13px] font-bold text-[#345942] block leading-tight whitespace-nowrap tracking-tight">
+                    ¥${day.saved.toFixed(0)}
+                  </span>
+                `
+                : `
+                  <span class="font-din text-[11px] text-[#B5C2BC] block leading-tight whitespace-nowrap">
+                    ¥0
+                  </span>
+                `
+              }
+            </div>
+
+            <!-- 审批标记：精简徽章，防止溢出 -->
+            <div class="w-full text-center">
+              ${day.approvals > 0
+                ? `<span class="inline-block text-[9px] font-bold text-[#8C6D40] bg-[#FAF5ED] px-1 py-0.2 rounded border border-[#EADBCA] leading-tight whitespace-nowrap">${day.approvals}审</span>`
+                : `<span class="text-[9px] text-[#CBD7CF] block leading-tight">—</span>`
+              }
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      },
+
+      renderMonthly: function() {
+        const grid = document.getElementById('month-days-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        // 2026年9月1日是周二，周一留空 1 格
+        const emptyCell = document.createElement('div');
+        emptyCell.className = "min-h-[56px] rounded-xl border border-transparent opacity-0 pointer-events-none";
+        grid.appendChild(emptyCell);
+
+        this.monthDays.forEach(day => {
+          const isSelected = day.key === this.selectedDayKey;
+          const cell = document.createElement('div');
+          cell.className = `p-1.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between items-center min-h-[58px] ${
+            isSelected
+              ? 'bg-[#FFFDF9] border-2 border-[#E34A32] shadow-xs scale-[1.04] z-10'
+              : 'bg-[#FAF7F2] hover:bg-[#F5EFE6] border-[#EADBCA]/70'
+          }`;
+          cell.onclick = () => statsCalendarSystem.selectDay(day.key);
+
+          cell.innerHTML = `
+            <div class="flex items-center justify-between w-full">
+              <span class="font-din text-[11px] font-bold ${
+                day.isToday ? 'w-4 h-4 rounded-full bg-[#E34A32] text-white flex items-center justify-center text-[9px]' : (isSelected ? 'text-[#E34A32]' : 'text-[#1C2621]')
+              }">
+                ${day.dayNum}
+              </span>
+              ${day.approvals > 0 
+                ? `<span class="text-[8px] font-bold text-[#8C6D40] bg-[#FAF5ED] px-1 rounded border border-[#EADBCA]">${day.approvals}审</span>` 
+                : ''
+              }
+            </div>
+
+            <div class="w-full text-center mt-0.5 overflow-visible">
+              ${day.saved > 0
+                ? `<span class="font-din text-[9px] font-bold text-[#345942] block leading-tight whitespace-nowrap">¥${day.saved.toFixed(0)}</span>`
+                : `<span class="text-[8px] text-[#A6B2AB] block leading-tight">•</span>`
+              }
+            </div>
+          `;
+          grid.appendChild(cell);
+        });
+      },
+
+      selectDay: function(key) {
+        this.selectedDayKey = key;
+        const day = (this.currentPeriod === 'week' ? this.weekDays : this.monthDays).find(d => d.key === key)
+          || this.monthDays.find(d => d.key === key)
+          || this.weekDays[6];
+
+        this.renderWeekly();
+        this.renderMonthly();
+
+        const titleEl = document.getElementById('detail-date-title');
+        const pillEl = document.getElementById('detail-date-pill');
+        const savedEl = document.getElementById('detail-date-saved');
+        const pillSaved = document.getElementById('detail-pill-saved');
+        const pillApproval = document.getElementById('detail-pill-approval');
+        const recordsBox = document.getElementById('detail-date-records');
+
+        if (titleEl) {
+          const parts = day.key.split('-');
+          titleEl.innerText = `${parseInt(parts[1])}月${parseInt(parts[2])}日 · ${day.dayOfWeek}`;
+        }
+        if (pillEl) {
+          if (day.isToday) {
+            pillEl.innerText = '今日';
+            pillEl.className = "text-[9px] font-bold text-[#E34A32] bg-[#FAF2F0] px-1.5 py-0.2 rounded border border-[#F6DCD8]";
+          } else {
+            pillEl.innerText = '自律日记';
+            pillEl.className = "text-[9px] font-medium text-[#707D76] bg-[#FAF7F2] px-1.5 py-0.2 rounded border border-[#EADBCA]";
+          }
+        }
+        if (savedEl) savedEl.innerText = `+¥${day.saved.toFixed(2)}`;
+        if (pillSaved) pillSaved.innerText = `当天已省 ¥${day.saved.toFixed(2)}`;
+        if (pillApproval) pillApproval.innerText = day.approvals > 0 ? `发起 ${day.approvals} 次审批` : '未发起买物审批';
+
+        if (recordsBox) {
+          recordsBox.innerHTML = '';
+          if (day.logs && day.logs.length > 0) {
+            day.logs.forEach(log => {
+              const row = document.createElement('div');
+              row.className = "flex items-center justify-between py-1 border-b border-[#F2ECE1]/80 last:border-0";
+              if (log.type === 'save') {
+                row.innerHTML = `
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs">🌾</span>
+                    <span class="text-[11px] text-[#1C2621]">${log.title}</span>
+                  </div>
+                  <span class="font-din text-xs font-bold text-[#345942]">${log.amount}</span>
+                `;
+              } else if (log.type === 'approval') {
+                row.innerHTML = `
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs">⚖️</span>
+                    <span class="text-[11px] text-[#8C6D40]">${log.title}</span>
+                  </div>
+                  <span class="text-[9px] font-bold text-[#8C6D40] bg-[#FAF5ED] px-1.5 py-0.2 rounded border border-[#EADBCA]">审批把关</span>
+                `;
+              } else {
+                row.innerHTML = `
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs">🌱</span>
+                    <span class="text-[11px] text-[#707D76] italic">${log.title}</span>
+                  </div>
+                  <span class="text-[9px] text-[#707D76]">平和</span>
+                `;
+              }
+              recordsBox.appendChild(row);
+            });
+          }
+        }
+      }
+    };
+
+    // 统计视图周期切换 (本周 / 本月日历联动)
+    function toggleStatsTab(period) {
+      statsCalendarSystem.currentPeriod = period;
+      const weekBtn = document.getElementById('stats-tab-week');
+      const monthBtn = document.getElementById('stats-tab-month');
+      const displayAmount = document.getElementById('stats-amount-display');
+      const calTitle = document.getElementById('calendar-title');
+      const calSub = document.getElementById('calendar-subtitle');
+      const calSavedLabel = document.getElementById('calendar-saved-label');
+      const calSavedVal = document.getElementById('calendar-saved-val');
+      const calApprovalsLabel = document.getElementById('calendar-approvals-label');
+      const calApprovalsVal = document.getElementById('calendar-approvals-val');
+      const weekView = document.getElementById('calendar-week-view');
+      const monthView = document.getElementById('calendar-month-view');
+      const blockedVal = document.getElementById('metric-blocked-val');
+      const blockedLabel = document.getElementById('metric-blocked-label');
+      const approvalsVal = document.getElementById('metric-approvals-val');
+      const approvalsLabel = document.getElementById('metric-approvals-label');
+
+      if (period === 'week') {
+        weekBtn.className = "flex-1 py-1.5 rounded-full text-xs font-bold transition-all bg-[#FAF7F2] text-[#E34A32] shadow-xs border border-[#EADBCA]";
+        monthBtn.className = "flex-1 py-1.5 rounded-full text-xs font-bold transition-all text-[#707D76]";
+        displayAmount.innerText = "¥1,280.50";
+
+        if (weekView) weekView.classList.remove('hidden');
+        if (monthView) monthView.classList.add('hidden');
+        if (calTitle) calTitle.innerText = "本周自律日历";
+        if (calSub) calSub.innerText = "9月15日 - 9月21日 · 每日省钱明细";
+        if (calSavedLabel) calSavedLabel.innerText = "本周省下";
+        if (calSavedVal) calSavedVal.innerText = "¥1,280.50";
+        if (calApprovalsLabel) calApprovalsLabel.innerText = "发起把关";
+        if (calApprovalsVal) calApprovalsVal.innerHTML = '6 <span class="text-[10px] font-normal">次审批</span>';
+
+        if (blockedVal) blockedVal.innerText = "6";
+        if (blockedLabel) blockedLabel.innerText = "本周阻击";
+        if (approvalsVal) approvalsVal.innerText = "6";
+        if (approvalsLabel) approvalsLabel.innerText = "发起审批";
+        statsCalendarSystem.renderWeekly();
+      } else {
+        monthBtn.className = "flex-1 py-1.5 rounded-full text-xs font-bold transition-all bg-[#FAF7F2] text-[#E34A32] shadow-xs border border-[#EADBCA]";
+        weekBtn.className = "flex-1 py-1.5 rounded-full text-xs font-bold transition-all text-[#707D76]";
+        displayAmount.innerText = "¥4,560.00";
+
+        if (weekView) weekView.classList.add('hidden');
+        if (monthView) monthView.classList.remove('hidden');
+        if (calTitle) calTitle.innerText = "2026年9月 · 全月自律日历";
+        if (calSub) calSub.innerText = "9月1日 - 9月30日 · 每日省钱明细";
+        if (calSavedLabel) calSavedLabel.innerText = "全月省下";
+        if (calSavedVal) calSavedVal.innerText = "¥4,560.00";
+        if (calApprovalsLabel) calApprovalsLabel.innerText = "发起把关";
+        if (calApprovalsVal) calApprovalsVal.innerHTML = '24 <span class="text-[10px] font-normal">次审批</span>';
+
+        if (blockedVal) blockedVal.innerText = "24";
+        if (blockedLabel) blockedLabel.innerText = "累计阻击";
+        if (approvalsVal) approvalsVal.innerText = "24";
+        if (approvalsLabel) approvalsLabel.innerText = "发起审批";
+        statsCalendarSystem.renderMonthly();
+      }
+    }
+
+    // 快捷记账
+    function openQuickSaveModal() {
+      document.getElementById('modal-quick-save').classList.remove('hidden');
+    }
+    function closeQuickSaveModal() {
+      document.getElementById('modal-quick-save').classList.add('hidden');
+    }
+
+    function setQuickInput(title, amount) {
+      document.getElementById('quick-input-title').value = title;
+      document.getElementById('quick-input-amount').value = amount;
+    }
+
+    let celebrationTimer = null;
+
+    function confirmQuickSave() {
+      const itemTitle = document.getElementById('quick-input-title').value.trim() || '冲动消费';
+      const amountVal = parseFloat(document.getElementById('quick-input-amount').value) || 28.00;
+
+      const prevSaved = appState.weeklySaved;
+      appState.weeklySaved += amountVal;
+      appState.blockedCount += 1;
+      appState.totalSaved += amountVal;
+
+      document.getElementById('home-blocked-display').innerHTML = `
+        <span class="w-1.5 h-1.5 rounded-full bg-[#E34A32]"></span>
+        已成功阻击 ${appState.blockedCount} 笔冲动消费
+      `;
+
+      // 实时追加至“最近守住的钱袋子”列表顶部
+      const logContainer = document.getElementById('home-recent-logs-container');
+      if (logContainer) {
+        const newCard = document.createElement('div');
+        newCard.className = "bg-[#FAF7F2] hover:bg-[#F4EFE6] rounded-2xl p-3.5 border border-[#EADBCA] flex items-center justify-between cursor-pointer active:scale-[0.99] transition-all";
+        newCard.onclick = () => showDetailLog(`差点买下：${itemTitle}`, amountVal.toFixed(2), '成功克制冲动，守住了理智金库！');
+        newCard.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-[#FFFFFF] border border-[#E6D9C8] flex items-center justify-center text-xs text-[#E34A32] font-medium">
+              🍅
+            </div>
+            <div>
+              <h3 class="text-xs font-bold text-[#1C2621]">差点买下：${itemTitle}</h3>
+              <p class="text-[10px] text-[#707D76] mt-0.5">刚刚 · 阻击成功</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="font-din text-base font-bold text-[#E34A32]">+¥${amountVal.toFixed(2)}</p>
+            <span class="text-[9px] bg-[#EBF4EE] text-[#345942] px-1.5 py-0.5 rounded font-medium">已守住</span>
+          </div>
+        `;
+        logContainer.prepend(newCard);
+      }
+
+      closeQuickSaveModal();
+      document.getElementById('quick-input-title').value = '';
+      document.getElementById('quick-input-amount').value = '';
+
+      // 触发放彩带与放烟花盛大庆典与空灵合成器音效
+      triggerSaveCelebration(amountVal, itemTitle, prevSaved);
+    }
+
+    // 数字滚动动画
+    function animateNumber(elementId, startVal, endVal, duration) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const startTime = performance.now();
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const current = startVal + (endVal - startVal) * ease;
+        el.innerText = current.toFixed(2);
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          el.innerText = endVal.toFixed(2);
+        }
+      }
+      requestAnimationFrame(update);
+    }
+
+    // ==================== 记账成功庆典：放烟花与放彩带动效 ====================
+    function triggerSaveCelebration(amountVal, itemTitle, prevSaved) {
+      // 1. 播放 Web Audio API 烟花与庆典音效
+      playSaveCelebrationSound();
+
+      // 2. 动画滚动首页结存
+      animateNumber('home-saved-display', prevSaved, appState.weeklySaved, 1200);
+
+      // 3. 设置弹窗内容
+      document.getElementById('celebrate-item-title').innerText = `差点买下：${itemTitle}`;
+      document.getElementById('celebrate-amount-display').innerText = amountVal.toFixed(2);
+
+      // 4. 动态生成彩带 (Confetti Silk Ribbons) 与烟花 (Fireworks) 粒子
+      const layer = document.getElementById('celebrate-particles-layer');
+      layer.innerHTML = '';
+
+      const ribbonColors = [
+        '#E34A32', // 陶土红 (LOEWE 番茄红)
+        '#F4BD38', // 鲜柠檬金黄
+        '#4B6E57', // 橄榄仙人掌绿
+        '#FFFDF8', // 象牙暖白丝带
+        '#ED7762', // 柔珊瑚粉
+        '#DDA67C'  // 暖杏色
+      ];
+
+      // A. 放彩带 (Silk Ribbon Streamers)
+      const ribbonCount = 38;
+      for (let i = 0; i < ribbonCount; i++) {
+        const ribbon = document.createElement('div');
+        const color = ribbonColors[Math.floor(Math.random() * ribbonColors.length)];
+        const width = 8 + Math.random() * 8;
+        const height = 18 + Math.random() * 20;
+        const left = (Math.random() * 96).toFixed(1) + '%';
+        const delay = (Math.random() * 0.45).toFixed(2) + 's';
+        const duration = (2.2 + Math.random() * 1.2).toFixed(2) + 's';
+        const borderRadius = Math.random() > 0.4 ? '4px' : '2px 8px 2px 8px';
+
+        ribbon.style.position = 'absolute';
+        ribbon.style.top = '-20px';
+        ribbon.style.left = left;
+        ribbon.style.width = width + 'px';
+        ribbon.style.height = height + 'px';
+        ribbon.style.backgroundColor = color;
+        ribbon.style.borderRadius = borderRadius;
+        ribbon.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
+        ribbon.style.animation = `animRibbonConfetti ${duration} ${delay} cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`;
+
+        layer.appendChild(ribbon);
+      }
+
+      // B. 放烟花 (Sparkling Fireworks Starbursts)
+      const fireworkCenters = [
+        { x: '24%', y: '22%' },
+        { x: '76%', y: '26%' },
+        { x: '50%', y: '16%' }
+      ];
+
+      fireworkCenters.forEach((center, cIdx) => {
+        // 烟花外扩光环
+        const ring = document.createElement('div');
+        ring.className = 'firework-spark-ring';
+        ring.style.position = 'absolute';
+        ring.style.left = `calc(${center.x} - 45px)`;
+        ring.style.top = `calc(${center.y} - 45px)`;
+        ring.style.width = '90px';
+        ring.style.height = '90px';
+        ring.style.borderRadius = '50%';
+        ring.style.border = '2px dashed ' + (cIdx === 1 ? '#E34A32' : '#F4BD38');
+        ring.style.animationDelay = (cIdx * 0.15) + 's';
+        layer.appendChild(ring);
+
+        // 烟花辐射星芒与光斑
+        const starChars = ['✦', '★', '✧', '•'];
+        const starCount = 14;
+        for (let s = 0; s < starCount; s++) {
+          const star = document.createElement('div');
+          const angle = (s / starCount) * Math.PI * 2;
+          const dist = 45 + Math.random() * 65;
+          const tx = Math.cos(angle) * dist;
+          const ty = Math.sin(angle) * dist;
+          const char = starChars[Math.floor(Math.random() * starChars.length)];
+          const delay = (cIdx * 0.12 + Math.random() * 0.08).toFixed(2);
+
+          star.innerText = char;
+          star.style.position = 'absolute';
+          star.style.left = center.x;
+          star.style.top = center.y;
+          star.style.color = (s % 2 === 0) ? '#E34A32' : '#F4BD38';
+          star.style.fontSize = (10 + Math.random() * 8) + 'px';
+          star.style.fontWeight = 'bold';
+          star.style.transition = 'all 1.1s cubic-bezier(0.1, 0.9, 0.2, 1)';
+          star.style.transform = 'translate(-50%, -50%) scale(0.2)';
+          star.style.opacity = '1';
+
+          layer.appendChild(star);
+
+          setTimeout(() => {
+            star.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1.2) rotate(${Math.random() * 60}deg)`;
+            star.style.opacity = '0';
+          }, (parseFloat(delay) * 1000) + 30);
+        }
+      });
+
+      // 5. 显示庆典弹窗
+      const modal = document.getElementById('modal-save-celebrate');
+      if (modal) {
+        modal.classList.remove('hidden');
+        const box = document.getElementById('celebrate-card-box');
+        if (box) {
+          box.classList.remove('celebrate-card-enter');
+          void box.offsetWidth;
+          box.classList.add('celebrate-card-enter');
+        }
+      }
+
+      // 6. 3.8 秒后自动轻柔关闭，亦可点击随时退出
+      if (celebrationTimer) clearTimeout(celebrationTimer);
+      celebrationTimer = setTimeout(() => {
+        closeSaveCelebration();
+      }, 3800);
+    }
+
+    function closeSaveCelebration() {
+      if (celebrationTimer) clearTimeout(celebrationTimer);
+      const modal = document.getElementById('modal-save-celebrate');
+      if (modal) modal.classList.add('hidden');
+      const layer = document.getElementById('celebrate-particles-layer');
+      if (layer) layer.innerHTML = '';
+    }
+
+    function handleCelebrateBackdropClick(e) {
+      if (e.target.id === 'modal-save-celebrate' || e.target.id === 'celebrate-particles-layer') {
+        closeSaveCelebration();
+      }
+    }
+
+    // 发起审批弹窗
+    function openApplyModal() {
+      document.getElementById('modal-apply-create').classList.remove('hidden');
+    }
+    function closeApplyModal() {
+      document.getElementById('modal-apply-create').classList.add('hidden');
+    }
+
+    let currentShareCase = {
+      item: '红轴机械键盘',
+      cost: '299.00',
+      reason: '现在的薄膜键盘敲得我手疼，买个红轴提升生产力...'
+    };
+
+    function confirmSubmitApply() {
+      const item = document.getElementById('apply-input-item').value.trim();
+      const cost = document.getElementById('apply-input-cost').value.trim();
+      const reason = document.getElementById('apply-input-note').value.trim();
+
+      if (!item || !cost) {
+        alert('请填写拟购物品与预算花费。');
+        return;
+      }
+
+      currentShareCase = {
+        item: item,
+        cost: parseFloat(cost).toFixed(2),
+        reason: reason || '想买一件好物提升生活品质，请好友帮我公审把关！'
+      };
+
+      closeApplyModal();
+      // 用户发起“想买”审批后，直接跳转到“分享给好友”
+      openShareApprovalModal(currentShareCase.item, currentShareCase.cost, currentShareCase.reason);
+    }
+
+    // 分享给好友弹窗管理
+    function openShareApprovalModal(item, cost, reason) {
+      document.getElementById('share-modal-item').innerText = item;
+      document.getElementById('share-modal-cost').innerText = `¥${cost}`;
+      document.getElementById('share-modal-reason').innerText = `“${reason}”`;
+
+      const toast = document.getElementById('share-toast-copied');
+      if (toast) toast.classList.add('hidden');
+      const btnText = document.getElementById('btn-send-text');
+      if (btnText) btnText.innerText = '发送给好友';
+
+      document.getElementById('modal-share-approval').classList.remove('hidden');
+    }
+
+    function closeShareApprovalModal() {
+      document.getElementById('modal-share-approval').classList.add('hidden');
+    }
+
+    function sendToFriendsAction() {
+      const shareText = `【理智好友公审令】我正在纠结要不要入手「${currentShareCase.item} (¥${currentShareCase.cost})」，特请好友帮我把关！购买理由：“${currentShareCase.reason}”。打开抠门大赛给我投票吧~`;
+
+      // 优先调用系统原生分享 (若设备支持)
+      if (navigator.share) {
+        navigator.share({
+          title: '好友理性公审把关',
+          text: shareText,
+          url: window.location.href
+        }).catch(() => {});
+      }
+
+      // 自动写入剪贴板，方便微信直接粘贴发送
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareText).catch(() => {});
+      }
+
+      const toast = document.getElementById('share-toast-copied');
+      if (toast) {
+        toast.innerText = '✓ 邀请口令已就绪，已成功唤起或复制！直接发送给微信好友即可';
+        toast.classList.remove('hidden');
+      }
+      const btnText = document.getElementById('btn-send-text');
+      if (btnText) btnText.innerText = '✓ 已发送 / 已复制邀请链接';
+
+      setTimeout(() => {
+        if (btnText) btnText.innerText = '发送给好友';
+      }, 3500);
+    }
+
+    // 勋章获取规则与说明弹窗管理
+    function openBadgeRulesModal() {
+      document.getElementById('modal-badge-rules').classList.remove('hidden');
+    }
+
+    function closeBadgeRulesModal() {
+      document.getElementById('modal-badge-rules').classList.add('hidden');
+    }
+
+    // 审批弹窗 (Approval Pop-up Modal)
+    function openCourtCaseModal(itemName = '红轴机械键盘', cost = '299.00', statement = '现在的薄膜键盘敲得我手疼，买个红轴提升生产力...') {
+      document.getElementById('modal-applicant-name').innerText = `申请人：张三`;
+      document.getElementById('modal-applicant-price').innerText = `¥${parseFloat(cost).toFixed(2)}`;
+      document.getElementById('modal-applicant-statement').innerText = `“${statement}”`;
+
+      document.getElementById('modal-decision-buttons').classList.remove('hidden');
+      document.getElementById('modal-stamp-result').classList.add('hidden');
+      
+      const inputEl = document.getElementById('modal-review-input');
+      if (inputEl) {
+        inputEl.value = '';
+        inputEl.classList.remove('input-error-shake', 'border-[#B55947]');
+        inputEl.classList.add('border-[#EADBCA]');
+      }
+      const errorTip = document.getElementById('review-error-tip');
+      if (errorTip) errorTip.classList.add('hidden');
+      const cardBox = document.getElementById('approval-card-box');
+      if (cardBox) cardBox.classList.remove('card-reject-shake');
+
+      document.getElementById('burst-canvas-container').innerHTML = '';
+      document.getElementById('modal-court').classList.remove('hidden');
+    }
+
+    function closeCourtModal() {
+      document.getElementById('modal-court').classList.add('hidden');
+    }
+
+    // 动态动效：更可爱、更好看、更生动的萌趣蔬果与柔美丝带欢腾浮升
+    // 包含圆鼓鼓小草莓、并蒂萌萌双樱桃、Q弹粉红小蜜桃、眨眼金币、开心小绿芽与柔光星芒
+    function triggerBotanicalRibbonBurst() {
+      // 伴随萌趣清脆的欢庆音效
+      playCuteApprovalSound();
+
+      const container = document.getElementById('burst-canvas-container');
+      container.innerHTML = '';
+
+      const particleCount = 28;
+      const cuteTemplates = [
+        // 1. 🍓 圆鼓鼓红颊萌萌小草莓 (Glossy Cute Strawberry with Rosy Cheeks)
+        `<svg viewBox="0 0 32 32" fill="none" class="w-7 h-7">
+          <path d="M16 6 C10 6 6 11 6 18 C6 24 12 28 16 30 C20 28 26 24 26 18 C26 11 22 6 16 6 Z" fill="#E34A32" />
+          <!-- 晶亮高光 -->
+          <ellipse cx="12" cy="13" rx="2.2" ry="3.8" transform="rotate(-25 12 13)" fill="#FF8D7A" opacity="0.85" />
+          <circle cx="10.5" cy="11.5" r="1" fill="#FFFFFF" />
+          <!-- 萌萌小腮红 -->
+          <ellipse cx="10" cy="20" rx="2" ry="1.2" fill="#FFA394" />
+          <ellipse cx="22" cy="20" rx="2" ry="1.2" fill="#FFA394" />
+          <!-- 可爱微甜笑容 -->
+          <path d="M14 21 Q16 23 18 21" stroke="#5E160C" stroke-width="1.2" stroke-linecap="round" fill="none" />
+          <!-- 嫩绿小草莓蒂 -->
+          <path d="M16 2 C16 4 13 6 11 5 C13 7 14 8 16 8 C18 8 19 7 21 5 C19 6 16 4 16 2 Z" fill="#4B6E57" />
+          <circle cx="16" cy="4" r="1" fill="#719B7E" />
+        </svg>`,
+
+        // 2. 🍒 萌萌并蒂红樱桃 (Cute Twin Cherries with Happy Smiling Faces)
+        `<svg viewBox="0 0 32 32" fill="none" class="w-7 h-7">
+          <!-- 樱桃果柄与小绿叶 -->
+          <path d="M11 16 C12 10 16 4 23 5" stroke="#3C624B" stroke-width="1.5" stroke-linecap="round" fill="none" />
+          <path d="M21 17 C20 11 18 6 16 5" stroke="#3C624B" stroke-width="1.5" stroke-linecap="round" fill="none" />
+          <path d="M17 5 Q21 2 24 6 Q20 7 17 5 Z" fill="#4B6E57" />
+          <!-- 左樱桃 (带开心眨眼) -->
+          <circle cx="11" cy="22" r="7" fill="#E03828" />
+          <circle cx="9" cy="19" r="1.5" fill="#FFA094" />
+          <ellipse cx="13" cy="22" rx="1.5" ry="0.9" fill="#FFA094" />
+          <circle cx="9" cy="21" r="1" fill="#420B04" />
+          <path d="M12 21 Q14 20 15 21" stroke="#420B04" stroke-width="1" stroke-linecap="round" fill="none" />
+          <path d="M10 24 Q11.5 25.5 13 24" stroke="#420B04" stroke-width="1" stroke-linecap="round" fill="none" />
+          <!-- 右樱桃 -->
+          <circle cx="21" cy="23" r="6.5" fill="#D32F1F" />
+          <circle cx="19" cy="20" r="1.2" fill="#FFA094" />
+          <ellipse cx="23.5" cy="23.5" rx="1.5" ry="0.9" fill="#FFA094" />
+          <circle cx="19.5" cy="22" r="0.9" fill="#420B04" />
+          <circle cx="23" cy="22" r="0.9" fill="#420B04" />
+          <path d="M20.5 25 Q21.5 26 22.5 25" stroke="#420B04" stroke-width="0.9" stroke-linecap="round" fill="none" />
+        </svg>`,
+
+        // 3. 🍑 Q弹初熟粉嫩小水蜜桃 (Bouncy Blushing Peach)
+        `<svg viewBox="0 0 32 32" fill="none" class="w-7 h-7">
+          <path d="M16 6 C10 6 5 11 5 18 C5 25 11 29 16 29 C21 29 27 25 27 18 C27 11 22 6 16 6 Z" fill="#FFAAA0" />
+          <!-- 渐变蜜桃心型弧线 -->
+          <path d="M16 7 C14 12 14 20 16 29" stroke="#E36152" stroke-width="1.2" stroke-linecap="round" opacity="0.6" />
+          <ellipse cx="11" cy="18" rx="2.5" ry="1.5" fill="#FF7869" opacity="0.65" />
+          <ellipse cx="21" cy="18" rx="2.5" ry="1.5" fill="#FF7869" opacity="0.65" />
+          <circle cx="12" cy="15" r="1" fill="#4A1812" />
+          <circle cx="20" cy="15" r="1" fill="#4A1812" />
+          <path d="M15 19 Q16 21 17 19" stroke="#4A1812" stroke-width="1.1" stroke-linecap="round" fill="none" />
+          <!-- 嫩叶 -->
+          <path d="M16 6 Q14 2 10 3 Q12 7 16 6 Z" fill="#4B6E57" />
+        </svg>`,
+
+        // 4. 🪙 萌趣眨眼小金币 (Joyful Winking Gold Coin)
+        `<svg viewBox="0 0 28 28" fill="none" class="w-6 h-6">
+          <circle cx="14" cy="14" r="12" fill="#FFC933" stroke="#DCA214" stroke-width="1.2" />
+          <circle cx="14" cy="14" r="9.5" stroke="#FFE794" stroke-width="1" stroke-dasharray="2 1.5" />
+          <!-- 眨眼萌表情 -->
+          <circle cx="11" cy="12" r="1.3" fill="#6B4B03" />
+          <path d="M16 11.5 Q18 10 19 12" stroke="#6B4B03" stroke-width="1.4" stroke-linecap="round" fill="none" />
+          <ellipse cx="9.5" cy="15" rx="1.8" ry="1" fill="#FF9A3D" opacity="0.75" />
+          <ellipse cx="18.5" cy="15" rx="1.8" ry="1" fill="#FF9A3D" opacity="0.75" />
+          <path d="M12.5 16 Q14 18 15.5 16" stroke="#6B4B03" stroke-width="1.3" stroke-linecap="round" fill="none" />
+        </svg>`,
+
+        // 5. 🌱 欢跃破土小嫩芽 (Cheerful Bouncy Sprout)
+        `<svg viewBox="0 0 26 26" fill="none" class="w-6 h-6">
+          <path d="M13 22 C13 14 13 8 13 6" stroke="#3C624B" stroke-width="2" stroke-linecap="round" />
+          <path d="M13 11 C8 9 5 14 13 15" fill="#588D6A" stroke="#2D4D39" stroke-width="1" />
+          <path d="M13 8 C18 6 21 11 13 12" fill="#71A884" stroke="#2D4D39" stroke-width="1" />
+          <!-- 嫩叶水滴 -->
+          <circle cx="19" cy="8" r="1.2" fill="#FFFFFF" opacity="0.8" />
+        </svg>`,
+
+        // 6. ✨ 柔光梦幻四角星芒 (Warm Golden Sparkle Star)
+        `<svg viewBox="0 0 24 24" fill="none" class="w-5 h-5">
+          <path d="M12 2 Q12 12 2 12 Q12 12 12 22 Q12 12 22 12 Q12 12 12 2 Z" fill="#F4BD38" />
+          <circle cx="12" cy="12" r="2.5" fill="#FFFFFF" />
+        </svg>`,
+
+        // 7. 🎀 奶油珊瑚小飘带 (Graceful Silk Ribbon Bow)
+        `<svg viewBox="0 0 32 16" fill="none" class="w-8 h-4">
+          <path d="M2 12 C10 2, 22 14, 30 4" stroke="#FAF5ED" stroke-width="3" stroke-linecap="round" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.06))" />
+          <path d="M5 14 C12 5, 20 12, 28 6" stroke="#FFA394" stroke-width="1.8" stroke-linecap="round" opacity="0.7" />
+        </svg>`
+      ];
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'cute-pass-particle';
+
+        // 充满生机与弹性的优雅扇形向上散开
+        const angle = -Math.PI * 0.5 + (Math.random() - 0.5) * (Math.PI * 1.15);
+        const distance = 95 + Math.random() * 140;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance - 40; // 轻盈欢跃向上漂浮
+        const rot = ((Math.random() - 0.5) * 110) + 'deg';
+        const duration = (1.4 + Math.random() * 0.7).toFixed(2) + 's';
+
+        particle.style.setProperty('--tx', `${tx}px`);
+        particle.style.setProperty('--ty', `${ty}px`);
+        particle.style.setProperty('--rot', rot);
+        particle.style.setProperty('--dur', duration);
+
+        // 出发位置：右侧“允许购买”按钮上方中心
+        particle.style.left = '72%';
+        particle.style.bottom = '44px';
+        particle.style.marginLeft = '-16px';
+
+        particle.innerHTML = cuteTemplates[i % cuteTemplates.length];
+        container.appendChild(particle);
+      }
+    }
+
+    // 驳回盖章音效 (Web Audio API 模拟清脆利落的印章击石/法槌定音)
+    function playRejectWoodGavelSound() {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(70, now + 0.12);
+        gain.gain.setValueAtTime(0.38, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.15);
+
+        const subOsc = ctx.createOscillator();
+        const subGain = ctx.createGain();
+        subOsc.type = 'sine';
+        subOsc.frequency.setValueAtTime(130, now);
+        subOsc.frequency.exponentialRampToValueAtTime(40, now + 0.22);
+        subGain.gain.setValueAtTime(0.25, now);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+        subOsc.connect(subGain);
+        subGain.connect(ctx.destination);
+        subOsc.start(now);
+        subOsc.stop(now + 0.25);
+      } catch (e) {
+        console.warn('Audio sound error:', e);
+      }
+    }
+
+    function applyDecision(decision) {
+      const inputEl = document.getElementById('modal-review-input');
+      const errorTip = document.getElementById('review-error-tip');
+      const cardBox = document.getElementById('approval-card-box');
+      const reviewText = (inputEl ? inputEl.value : '').trim();
+
+      // 购买申请弹窗中，点击“驳回申请”和“允许购买”时，必须填写理由
+      if (!reviewText) {
+        if (errorTip) errorTip.classList.remove('hidden');
+        if (inputEl) {
+          inputEl.classList.remove('border-[#EADBCA]');
+          inputEl.classList.add('border-[#B55947]', 'input-error-shake');
+          inputEl.focus();
+          setTimeout(() => {
+            inputEl.classList.remove('input-error-shake');
+          }, 600);
+        }
+        return;
+      }
+
+      if (errorTip) errorTip.classList.add('hidden');
+      if (inputEl) {
+        inputEl.classList.remove('border-[#B55947]');
+        inputEl.classList.add('border-[#EADBCA]');
+      }
+
+      // 驳回申请动态动效：卡片剧烈震颤反馈 + 驳回木槌盖章重响 + 红色双线印章盖下动效
+      if (decision === 'reject') {
+        playRejectWoodGavelSound();
+        if (cardBox) {
+          cardBox.classList.remove('card-reject-shake');
+          void cardBox.offsetWidth; // 触发回流以重置动画
+          cardBox.classList.add('card-reject-shake');
+          setTimeout(() => {
+            cardBox.classList.remove('card-reject-shake');
+          }, 600);
+        }
+      } else {
+        // 允许购买：优雅丝带与果实飘逸反馈 (NO fireworks, NO firework sparks)
+        triggerBotanicalRibbonBurst();
+      }
+
+      document.getElementById('modal-decision-buttons').classList.add('hidden');
+      const stampContainer = document.getElementById('modal-stamp-result');
+      const stampBadge = document.getElementById('stamp-seal');
+      const stampTitle = document.getElementById('stamp-title');
+      const stampSub = document.getElementById('stamp-sub-text');
+      const summaryText = document.getElementById('stamp-summary');
+      const opinionEl = document.getElementById('stamp-opinion-text');
+
+      if (decision === 'reject') {
+        stampBadge.className = "stamp-animate inline-block border-4 border-double px-4 py-2 rounded-xl text-center border-[#B55947] text-[#B55947] bg-[#B55947]/5";
+        stampTitle.innerText = "驳回申请 · 守住钱袋";
+        stampSub.innerText = "成功将冲动阻击在金库";
+        summaryText.innerText = "审批结果：驳回成功！冲动已制止";
+        summaryText.className = "text-xs font-bold text-[#B55947]";
+        opinionEl.innerText = `审批理由：“${reviewText}”`;
+      } else {
+        stampBadge.className = "stamp-animate inline-block border-4 border-double px-4 py-2 rounded-xl text-center border-[#181D1B] text-[#181D1B] bg-[#FAF7F2]";
+        stampTitle.innerText = "允许购买 · 确认刚需";
+        stampSub.innerText = "放行通关";
+        summaryText.innerText = "审批结果：允许购买！请按预算理性消费";
+        summaryText.className = "text-xs font-bold text-[#181D1B]";
+        opinionEl.innerText = `审批理由：“${reviewText}”`;
+      }
+
+      stampContainer.classList.remove('hidden');
+    }
+
+    function showDetailLog(title, amount, note) {
+      alert(`【${title}】\n守住金额：¥${amount}\n说明：${note}`);
+    }
+
+    // ==================== Web Audio API: 极简空灵微型合成器 (清晨露珠与草木舒展) ====================
+    let audioCtxInstance = null;
+
+    function getAudioContext() {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return null;
+        if (!audioCtxInstance) {
+          audioCtxInstance = new AudioContextClass();
+        }
+        if (audioCtxInstance.state === 'suspended') {
+          audioCtxInstance.resume();
+        }
+        return audioCtxInstance;
+      } catch (e) {
+        console.warn('AudioContext not supported or restricted:', e);
+        return null;
+      }
+    }
+
+    // 播放一段极简、空灵的‘清晨露珠坠落’与‘植物舒展’的微型合成器音效
+    function playDewdropAndGrowthSound() {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      try {
+        const now = ctx.currentTime;
+        
+        // 总主控柔和增益 (确保空灵柔美，绝不刺耳，克制在舒适分贝)
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.28, now);
+        masterGain.connect(ctx.destination);
+
+        // -------------------------------------------------------------
+        // 1. 清晨露珠坠落 (Morning Dewdrop Plop & Crystal Resonant Ring)
+        // -------------------------------------------------------------
+        // 露珠主音：起始快速下沉后微共振弹起，模拟露珠坠于嫩叶表面的表面张力与微水珠滴答
+        const dropOsc = ctx.createOscillator();
+        const dropGain = ctx.createGain();
+        dropOsc.type = 'sine';
+        dropOsc.frequency.setValueAtTime(750, now);
+        dropOsc.frequency.exponentialRampToValueAtTime(1420, now + 0.035);
+        dropOsc.frequency.exponentialRampToValueAtTime(987.77, now + 0.12); // B5 清澈纯音
+
+        dropGain.gain.setValueAtTime(0.0001, now);
+        dropGain.gain.linearRampToValueAtTime(0.22, now + 0.025);
+        dropGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+
+        dropOsc.connect(dropGain);
+        dropGain.connect(masterGain);
+        dropOsc.start(now);
+        dropOsc.stop(now + 0.4);
+
+        // 露珠剔透晶莹泛音 (High Crystalline Shimmer, 2093 Hz / C7)
+        const chimeOsc = ctx.createOscillator();
+        const chimeGain = ctx.createGain();
+        chimeOsc.type = 'sine';
+        chimeOsc.frequency.setValueAtTime(2093, now + 0.02);
+        chimeGain.gain.setValueAtTime(0.0001, now + 0.02);
+        chimeGain.gain.linearRampToValueAtTime(0.08, now + 0.04);
+        chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+        chimeOsc.connect(chimeGain);
+        chimeGain.connect(masterGain);
+        chimeOsc.start(now + 0.02);
+        chimeOsc.stop(now + 0.48);
+
+        // 伴生微露珠涟漪 (Secondary gentle drop at t + 0.16s, 1318.5 Hz / E6)
+        const rippleOsc = ctx.createOscillator();
+        const rippleGain = ctx.createGain();
+        rippleOsc.type = 'sine';
+        rippleOsc.frequency.setValueAtTime(1100, now + 0.16);
+        rippleOsc.frequency.exponentialRampToValueAtTime(1550, now + 0.19);
+        rippleOsc.frequency.exponentialRampToValueAtTime(1318.5, now + 0.26);
+
+        rippleGain.gain.setValueAtTime(0.0001, now + 0.16);
+        rippleGain.gain.linearRampToValueAtTime(0.12, now + 0.185);
+        rippleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.48);
+
+        rippleOsc.connect(rippleGain);
+        rippleGain.connect(masterGain);
+        rippleOsc.start(now + 0.16);
+        rippleOsc.stop(now + 0.5);
+
+        // -------------------------------------------------------------
+        // 2. 植物萌芽舒展 (Plant Germination & Warm Stem Unfurling)
+        // 柔和低通滤波的五声音阶琶音，随枝茎向上舒展依次升华 (G4 -> C5 -> E5)
+        // -------------------------------------------------------------
+        const stretchTones = [
+          { freq: 392.00, start: 0.65, dur: 0.75, gain: 0.065 }, // G4 种子破土
+          { freq: 523.25, start: 1.15, dur: 0.85, gain: 0.075 }, // C5 抽茎拔节
+          { freq: 659.25, start: 1.70, dur: 0.95, gain: 0.08 }   // E5 展叶迎光
+        ];
+
+        stretchTones.forEach(tone => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+
+          osc.type = 'triangle'; // 三角波温润自然、泛音适度
+          osc.frequency.setValueAtTime(tone.freq, now + tone.start);
+
+          // 低通滤波器缓缓开启，模拟植物纤维在晨曦中舒张开来的温润质感
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(600, now + tone.start);
+          filter.frequency.exponentialRampToValueAtTime(2200, now + tone.start + tone.dur);
+
+          g.gain.setValueAtTime(0.0001, now + tone.start);
+          g.gain.linearRampToValueAtTime(tone.gain, now + tone.start + 0.12);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + tone.start + tone.dur);
+
+          osc.connect(filter);
+          filter.connect(g);
+          g.connect(masterGain);
+
+          osc.start(now + tone.start);
+          osc.stop(now + tone.start + tone.dur + 0.06);
+        });
+
+        // -------------------------------------------------------------
+        // 3. 繁花初绽空灵余韵 (Blossom Shimmer & Ethereal Chord Tail)
+        // 在花苞绽放时刻 (2.35s - 2.8s) 泛起空灵微风和弦 (G5, C6, E6, G6)
+        // -------------------------------------------------------------
+        const bloomChords = [
+          { freq: 783.99, delay: 2.35, dur: 1.6, gain: 0.07 },   // G5
+          { freq: 1046.50, delay: 2.45, dur: 1.8, gain: 0.08 },  // C6
+          { freq: 1318.51, delay: 2.56, dur: 1.9, gain: 0.085 }, // E6
+          { freq: 1567.98, delay: 2.68, dur: 2.1, gain: 0.06 }   // G6
+        ];
+
+        bloomChords.forEach(chord => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(chord.freq, now + chord.delay);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(2600, now + chord.delay);
+
+          g.gain.setValueAtTime(0.0001, now + chord.delay);
+          g.gain.linearRampToValueAtTime(chord.gain, now + chord.delay + 0.1);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + chord.delay + chord.dur);
+
+          osc.connect(filter);
+          filter.connect(g);
+          g.connect(masterGain);
+
+          osc.start(now + chord.delay);
+          osc.stop(now + chord.delay + chord.dur + 0.06);
+        });
+
+      } catch (err) {
+        console.warn('Web Audio playback error:', err);
+      }
+    }
+
+    // ==================== Web Audio API: 记账抠门烟花与彩带胜利庆典音效 ====================
+    function playSaveCelebrationSound() {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      try {
+        const now = ctx.currentTime;
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.35, now);
+        masterGain.connect(ctx.destination);
+
+        // 1. 烟花升空呼啸与脆响 (Firework launch swoosh & spark burst)
+        const launchOsc = ctx.createOscillator();
+        const launchGain = ctx.createGain();
+        launchOsc.type = 'sine';
+        launchOsc.frequency.setValueAtTime(220, now);
+        launchOsc.frequency.exponentialRampToValueAtTime(860, now + 0.18);
+        launchGain.gain.setValueAtTime(0.0001, now);
+        launchGain.gain.linearRampToValueAtTime(0.18, now + 0.08);
+        launchGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+        launchOsc.connect(launchGain);
+        launchGain.connect(masterGain);
+        launchOsc.start(now);
+        launchOsc.stop(now + 0.22);
+
+        // 烟花星芒炸裂晶莹簇音 (Crystalline starburst cluster at t + 0.18s)
+        const starCluster = [1046.50, 1318.51, 1567.98, 2093.00, 2637.02];
+        starCluster.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + 0.18 + idx * 0.03);
+          g.gain.setValueAtTime(0.0001, now + 0.18 + idx * 0.03);
+          g.gain.linearRampToValueAtTime(0.14, now + 0.2 + idx * 0.03);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + 0.58 + idx * 0.03);
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now + 0.18 + idx * 0.03);
+          osc.stop(now + 0.62 + idx * 0.03);
+        });
+
+        // 2. 欢快胜利大调和弦 (Upbeat celebratory major fanfare: C5 -> E5 -> G5 -> C6)
+        const fanfareNotes = [
+          { freq: 523.25, time: 0.36, dur: 0.45, gain: 0.14 }, // C5
+          { freq: 659.25, time: 0.50, dur: 0.45, gain: 0.16 }, // E5
+          { freq: 783.99, time: 0.64, dur: 0.50, gain: 0.18 }, // G5
+          { freq: 1046.50, time: 0.80, dur: 1.10, gain: 0.22 }  // C6 胜利高音
+        ];
+        fanfareNotes.forEach(fn => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(fn.freq, now + fn.time);
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1400, now + fn.time);
+          filter.frequency.exponentialRampToValueAtTime(3600, now + fn.time + 0.1);
+          g.gain.setValueAtTime(0.0001, now + fn.time);
+          g.gain.linearRampToValueAtTime(fn.gain, now + fn.time + 0.06);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + fn.time + fn.dur);
+          osc.connect(filter);
+          filter.connect(g);
+          g.connect(masterGain);
+          osc.start(now + fn.time);
+          osc.stop(now + fn.time + fn.dur + 0.05);
+        });
+
+        // 3. 理智金币清脆落袋声 (Golden coin clink: 2637Hz & 3136Hz)
+        const coin1 = ctx.createOscillator();
+        const coinG1 = ctx.createGain();
+        coin1.type = 'sine';
+        coin1.frequency.setValueAtTime(2637.02, now + 1.15); // E7
+        coinG1.gain.setValueAtTime(0.0001, now + 1.15);
+        coinG1.gain.linearRampToValueAtTime(0.14, now + 1.165);
+        coinG1.gain.exponentialRampToValueAtTime(0.0001, now + 1.75);
+        coin1.connect(coinG1);
+        coinG1.connect(masterGain);
+        coin1.start(now + 1.15);
+        coin1.stop(now + 1.8);
+
+        const coin2 = ctx.createOscillator();
+        const coinG2 = ctx.createGain();
+        coin2.type = 'sine';
+        coin2.frequency.setValueAtTime(3135.96, now + 1.30); // G7
+        coinG2.gain.setValueAtTime(0.0001, now + 1.30);
+        coinG2.gain.linearRampToValueAtTime(0.15, now + 1.315);
+        coinG2.gain.exponentialRampToValueAtTime(0.0001, now + 1.95);
+        coin2.connect(coinG2);
+        coinG2.connect(masterGain);
+        coin2.start(now + 1.30);
+        coin2.stop(now + 2.0);
+
+      } catch (err) {
+        console.warn('Web Audio celebration sound error:', err);
+      }
+    }
+
+    // ==================== Web Audio API: 庭院轻灵风铃声学合成引擎 ====================
+    // 清透、空灵、治愈的水晶/铜管风铃声 (Crystalline Wind Chime Audio Synthesis)
+    function playWindChimeSound() {
+      // 触感反馈：微风轻拂风铃悬穗的微弱震颤
+      try {
+        if (navigator && typeof navigator.vibrate === 'function') {
+          navigator.vibrate([10, 20, 10]);
+        }
+      } catch (vErr) {}
+
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      try {
+        const now = ctx.currentTime;
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.32, now);
+        masterGain.connect(ctx.destination);
+
+        // 庭院风铃五声调式音管 (Pentatonic Wind Chime Tubes)
+        // 随微风轻碰依次发出清澈通透的叮咚风铃声 (E6, G6, A6, B6, E7)
+        const chimeTubes = [
+          { freq: 1318.51, delay: 0.000, gain: 0.22, decay: 1.5 }, // E6
+          { freq: 1567.98, delay: 0.040, gain: 0.24, decay: 1.7 }, // G6
+          { freq: 1760.00, delay: 0.085, gain: 0.20, decay: 1.4 }, // A6
+          { freq: 1975.53, delay: 0.130, gain: 0.25, decay: 1.8 }, // B6
+          { freq: 2637.02, delay: 0.175, gain: 0.18, decay: 1.6 }  // E7
+        ];
+
+        chimeTubes.forEach(tube => {
+          const startTime = now + tube.delay;
+
+          // 1. 纯净风铃基准正弦音频
+          const osc1 = ctx.createOscillator();
+          const gain1 = ctx.createGain();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(tube.freq, startTime);
+
+          // 击槌接触瞬态：极速打击 (3ms) -> 空灵悠长指数自然衰减
+          gain1.gain.setValueAtTime(0.0001, startTime);
+          gain1.gain.linearRampToValueAtTime(tube.gain, startTime + 0.003);
+          gain1.gain.exponentialRampToValueAtTime(0.0001, startTime + tube.decay);
+
+          osc1.connect(gain1);
+          gain1.connect(masterGain);
+          osc1.start(startTime);
+          osc1.stop(startTime + tube.decay + 0.05);
+
+          // 2. 金属圆管风铃物理高次谐波泛音 (Cylindrical Tube High Partial: ~2.756x)
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(tube.freq * 2.756, startTime);
+
+          gain2.gain.setValueAtTime(0.0001, startTime);
+          gain2.gain.linearRampToValueAtTime(tube.gain * 0.25, startTime + 0.002);
+          gain2.gain.exponentialRampToValueAtTime(0.0001, startTime + (tube.decay * 0.65));
+
+          osc2.connect(gain2);
+          gain2.connect(masterGain);
+          osc2.start(startTime);
+          osc2.stop(startTime + (tube.decay * 0.65) + 0.05);
+        });
+
+        // 3. 微风拂过风铃叶片的微气流垫层 (Gentle Breeze Swell)
+        const breezeOsc = ctx.createOscillator();
+        const breezeGain = ctx.createGain();
+        breezeOsc.type = 'sine';
+        breezeOsc.frequency.setValueAtTime(520, now);
+        breezeOsc.frequency.exponentialRampToValueAtTime(780, now + 0.38);
+        breezeGain.gain.setValueAtTime(0.0001, now);
+        breezeGain.gain.linearRampToValueAtTime(0.018, now + 0.07);
+        breezeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+        breezeOsc.connect(breezeGain);
+        breezeGain.connect(masterGain);
+        breezeOsc.start(now);
+        breezeOsc.stop(now + 0.6);
+
+      } catch (err) {
+        console.warn('Wind chime audio synthesis error:', err);
+      }
+    }
+
+    // ==================== 购买申请通过：萌趣欢腾庆祝微音效 ====================
+    function playCuteApprovalSound() {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.26, now);
+        masterGain.connect(ctx.destination);
+
+        // 萌趣上行跳跃三和弦 (Cute Bouncy Arpeggio: F5 -> A5 -> C6 -> E6)
+        const notes = [
+          { f: 698.46, t: 0.00, dur: 0.35, g: 0.16 },
+          { f: 880.00, t: 0.07, dur: 0.38, g: 0.18 },
+          { f: 1046.50, t: 0.14, dur: 0.42, g: 0.22 },
+          { f: 1318.51, t: 0.21, dur: 0.65, g: 0.25 }
+        ];
+
+        notes.forEach(note => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(note.f, now + note.t);
+
+          g.gain.setValueAtTime(0.0001, now + note.t);
+          g.gain.linearRampToValueAtTime(note.g, now + note.t + 0.015);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + note.t + note.dur);
+
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now + note.t);
+          osc.stop(now + note.t + note.dur + 0.02);
+        });
+      } catch (e) {
+        console.warn('Cute approval sound error:', e);
+      }
+    }
+
+    // 番茄标本与风铃触碰音效 (统一接入风铃声学系统)
+    function playBotanicalLeafRustleSound() {
+      playWindChimeSound();
+    }
+
+    function playTomatoGardenChime() {
+      playWindChimeSound();
+    }
+
+    // ==================== Web Audio API: “心如止水” 空灵清泉水滴与涟漪声学合成引擎 ====================
+    // 包含：水滴入水跃频 (Water Droplet Plop)、微泡共鸣 (Bubble Resonance)、涟漪扩散 (Ripple Warmth) 与静心余韵和弦 (Pentatonic Overtones)
+    function playStillWaterSound() {
+      // 触感反馈：水滴触水微波轻颤
+      try {
+        if (navigator && typeof navigator.vibrate === 'function') {
+          navigator.vibrate([12, 24, 16]);
+        }
+      } catch (vErr) {}
+
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      try {
+        const now = ctx.currentTime;
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.36, now);
+        masterGain.connect(ctx.destination);
+
+        // 1. 第一颗晶莹露滴入水跃频 (Upward Frequency Sweep - Pure Droplet Plop)
+        // 经典的 Minnaert 水滴气泡声：频率从 680Hz 迅速上滑至 1860Hz，在 0.14s 内指数衰减
+        const drop1Osc = ctx.createOscillator();
+        const drop1Gain = ctx.createGain();
+        drop1Osc.type = 'sine';
+        drop1Osc.frequency.setValueAtTime(680, now + 0.02);
+        drop1Osc.frequency.exponentialRampToValueAtTime(1860, now + 0.09);
+        drop1Gain.gain.setValueAtTime(0.0001, now);
+        drop1Gain.gain.linearRampToValueAtTime(0.35, now + 0.035);
+        drop1Gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        drop1Osc.connect(drop1Gain);
+        drop1Gain.connect(masterGain);
+        drop1Osc.start(now + 0.02);
+        drop1Osc.stop(now + 0.22);
+
+        // 2. 第二颗微型回弹水珠溅起 (Secondary Delicate Droplet Bounce at 0.11s)
+        const drop2Osc = ctx.createOscillator();
+        const drop2Gain = ctx.createGain();
+        drop2Osc.type = 'sine';
+        drop2Osc.frequency.setValueAtTime(1200, now + 0.12);
+        drop2Osc.frequency.exponentialRampToValueAtTime(2450, now + 0.17);
+        drop2Gain.gain.setValueAtTime(0.0001, now + 0.11);
+        drop2Gain.gain.linearRampToValueAtTime(0.18, now + 0.13);
+        drop2Gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
+        drop2Osc.connect(drop2Gain);
+        drop2Gain.connect(masterGain);
+        drop2Osc.start(now + 0.11);
+        drop2Osc.stop(now + 0.28);
+
+        // 3. 水面微波低沉共振声 (Deep Water Body & Cavern Ripple Warmth)
+        const rippleBodyOsc = ctx.createOscillator();
+        const rippleBodyGain = ctx.createGain();
+        const rippleFilter = ctx.createBiquadFilter();
+        rippleBodyOsc.type = 'sine';
+        rippleBodyOsc.frequency.setValueAtTime(261.63, now + 0.04); // C4
+        rippleBodyOsc.frequency.linearRampToValueAtTime(246.94, now + 0.5); // 微微降频
+        rippleFilter.type = 'lowpass';
+        rippleFilter.frequency.setValueAtTime(600, now + 0.04);
+        rippleBodyGain.gain.setValueAtTime(0.0001, now + 0.04);
+        rippleBodyGain.gain.linearRampToValueAtTime(0.22, now + 0.12);
+        rippleBodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+        rippleBodyOsc.connect(rippleFilter);
+        rippleFilter.connect(rippleBodyGain);
+        rippleBodyGain.connect(masterGain);
+        rippleBodyOsc.start(now + 0.04);
+        rippleBodyOsc.stop(now + 1.25);
+
+        // 4. 清泉水面泛起的五声空灵泛音 (Pentatonic Water Ripple Overtones: G5, C6, E6, A6)
+        const waterTones = [
+          { freq: 783.99, delay: 0.35, dur: 1.6, gain: 0.08 },   // G5
+          { freq: 1046.50, delay: 0.52, dur: 1.8, gain: 0.09 },  // C6
+          { freq: 1318.51, delay: 0.70, dur: 2.0, gain: 0.085 }, // E6
+          { freq: 1760.00, delay: 0.90, dur: 1.9, gain: 0.06 }   // A6
+        ];
+
+        waterTones.forEach(tone => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          const f = ctx.createBiquadFilter();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(tone.freq, now + tone.delay);
+          f.type = 'lowpass';
+          f.frequency.setValueAtTime(2400, now + tone.delay);
+          g.gain.setValueAtTime(0.0001, now + tone.delay);
+          g.gain.linearRampToValueAtTime(tone.gain, now + tone.delay + 0.08);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + tone.delay + tone.dur);
+          osc.connect(f);
+          f.connect(g);
+          g.connect(masterGain);
+          osc.start(now + tone.delay);
+          osc.stop(now + tone.delay + tone.dur + 0.05);
+        });
+
+      } catch (err) {
+        console.warn('Web Audio still water sound error:', err);
+      }
+    }
+
+    // ==================== 植物生命美学：统一动效与声学调度引擎 (Botanical Life Motion Engine) ====================
+    const BotanicalEngine = {
+      activeBadge: 'flower', // 'flower' | 'water'
+      timers: {
+        specimen: null,
+        profileGrowth: null,
+        modalGrowth: null,
+        profileWater: null,
+        modalWater: null
+      },
+
+      // 1. 首页番茄标本卡片：“植物呼吸”微震颤生命动效
+      breatheSpecimen: function() {
+        const card = document.getElementById('home-botanical-card');
+        const img = document.getElementById('home-botanical-img');
+        const aura = document.getElementById('home-botanical-aura');
+
+        // 播放 Web Audio API 植物轻微叶片摩擦声
+        this.audio.playLeafRustle();
+
+        if (this.timers.specimen) clearTimeout(this.timers.specimen);
+
+        // 重置并触发呼吸微震颤 CSS 动画
+        [card, img, aura].forEach(el => {
+          if (!el) return;
+          el.classList.remove('botanical-breathing-tremor', 'specimen-leaf-jitter', 'botanical-aura-pulse');
+          void el.offsetWidth; // 触发回流以重新启动动画
+        });
+
+        if (card) card.classList.add('botanical-breathing-tremor');
+        if (img) img.classList.add('specimen-leaf-jitter');
+        if (aura) aura.classList.add('botanical-aura-pulse');
+
+        this.timers.specimen = setTimeout(() => {
+          if (card) card.classList.remove('botanical-breathing-tremor');
+          if (img) img.classList.remove('specimen-leaf-jitter');
+          if (aura) aura.classList.remove('botanical-aura-pulse');
+        }, 900);
+      },
+
+      // 2. 成就图鉴勋章：克制之花生根发芽与繁花盛开动效
+      growBadge: function(target = 'profile') {
+        // 触发清晨露珠坠落与植物舒展的 Web Audio API 空灵微音效
+        this.audio.playDewdropGrowth();
+        this.activeBadge = 'flower';
+
+        if (target === 'profile' || target === 'both') {
+          const stage = document.getElementById('profile-plant-stage');
+          const badgeCard = document.getElementById('badge-card-flower');
+          const statusText = document.getElementById('growth-status-text');
+          const statusIcon = document.getElementById('growth-status-icon');
+          const replayBtn = document.getElementById('btn-replay-growth');
+
+          if (stage) {
+            if (this.timers.profileGrowth) clearTimeout(this.timers.profileGrowth);
+            stage.classList.remove('is-idle', 'is-bloomed', 'is-growing');
+            void stage.offsetWidth;
+
+            stage.classList.add('is-growing');
+            if (badgeCard) badgeCard.classList.add('badge-interactive-active');
+            if (replayBtn) {
+              replayBtn.classList.remove('text-[#345942]');
+              replayBtn.classList.add('text-[#E34A32]');
+            }
+
+            if (statusIcon) statusIcon.innerText = '🌱';
+            if (statusText) statusText.innerText = '露珠滴落，种子破土苏醒...';
+
+            setTimeout(() => {
+              if (stage.classList.contains('is-growing')) {
+                if (statusIcon) statusIcon.innerText = '🌿';
+                if (statusText) statusText.innerText = '晨曦微润，嫩茎向上舒展...';
+              }
+            }, 800);
+
+            setTimeout(() => {
+              if (stage.classList.contains('is-growing')) {
+                if (statusIcon) statusIcon.innerText = '🍃';
+                if (statusText) statusText.innerText = '展叶舒枝，汲取自律克制养分...';
+              }
+            }, 1800);
+
+            setTimeout(() => {
+              if (stage.classList.contains('is-growing')) {
+                if (statusIcon) statusIcon.innerText = '🌸';
+                if (statusText) statusText.innerText = '繁花空灵初绽！克制之花悄然盛开';
+              }
+            }, 2800);
+
+            this.timers.profileGrowth = setTimeout(() => {
+              stage.classList.remove('is-growing');
+              stage.classList.add('is-bloomed');
+              if (badgeCard) badgeCard.classList.remove('badge-interactive-active');
+            }, 4000);
+          }
+        }
+
+        if (target === 'modal' || target === 'both') {
+          const mStage = document.getElementById('modal-plant-stage');
+          const s1 = document.getElementById('step-node-1');
+          const s2 = document.getElementById('step-node-2');
+          const s3 = document.getElementById('step-node-3');
+          const desc = document.getElementById('modal-growth-desc');
+
+          if (mStage) {
+            if (this.timers.modalGrowth) clearTimeout(this.timers.modalGrowth);
+            mStage.classList.remove('is-idle', 'is-bloomed', 'is-growing');
+            void mStage.offsetWidth;
+
+            mStage.classList.add('is-growing');
+
+            const setActive = (activeNode) => {
+              [s1, s2, s3].forEach(node => {
+                if (node) {
+                  node.className = "py-1 px-1.5 rounded-lg bg-[#FAF7F2] border border-[#EADBCA] text-[10px] text-[#707D76] transition-all";
+                }
+              });
+              if (activeNode) {
+                activeNode.className = "py-1 px-1.5 rounded-lg bg-[#E34A32] text-white font-bold border border-[#E34A32] text-[10px] shadow-xs transition-all";
+              }
+            };
+
+            setActive(s1);
+            if (desc) desc.innerText = '“理智之种破土而生，感知克制的力量...”';
+
+            setTimeout(() => {
+              if (mStage.classList.contains('is-growing')) {
+                setActive(s2);
+                if (desc) desc.innerText = '“枝叶舒展如松柏，沉静抵御每一次物欲杂念...”';
+              }
+            }, 1500);
+
+            setTimeout(() => {
+              if (mStage.classList.contains('is-growing')) {
+                setActive(s3);
+                if (desc) desc.innerText = '“繁花盛放！心若从容，生活便处处盛开自律之花。”';
+              }
+            }, 2600);
+
+            this.timers.modalGrowth = setTimeout(() => {
+              mStage.classList.remove('is-growing');
+              mStage.classList.add('is-bloomed');
+            }, 4000);
+          }
+        }
+      },
+
+      // 3. 成就图鉴勋章：心如止水 清泉水滴涟漪与静心动效
+      rippleWater: function(target = 'profile') {
+        // 播放 Web Audio API 清泉水滴与空灵涟漪音效
+        this.audio.playStillWater();
+        this.activeBadge = 'water';
+
+        if (target === 'profile' || target === 'both') {
+          const stage = document.getElementById('profile-water-stage');
+          const badgeCard = document.getElementById('badge-card-water');
+          const statusText = document.getElementById('growth-status-text');
+          const statusIcon = document.getElementById('growth-status-icon');
+          const replayBtn = document.getElementById('btn-replay-growth');
+
+          if (stage) {
+            if (this.timers.profileWater) clearTimeout(this.timers.profileWater);
+            stage.classList.remove('is-idle', 'is-calmed', 'is-rippling');
+            void stage.offsetWidth;
+
+            stage.classList.add('is-rippling');
+            if (badgeCard) badgeCard.classList.add('badge-interactive-active');
+            if (replayBtn) {
+              replayBtn.classList.remove('text-[#E34A32]');
+              replayBtn.classList.add('text-[#345942]');
+            }
+
+            if (statusIcon) statusIcon.innerText = '💧';
+            if (statusText) statusText.innerText = '露珠坠落，清澈泉水泛起圈圈自律涟漪...';
+
+            setTimeout(() => {
+              if (stage.classList.contains('is-rippling')) {
+                if (statusIcon) statusIcon.innerText = '🌊';
+                if (statusText) statusText.innerText = '物欲杂念随清波涤净，灵台澄澈空明...';
+              }
+            }, 1100);
+
+            setTimeout(() => {
+              if (stage.classList.contains('is-rippling')) {
+                if (statusIcon) statusIcon.innerText = '✨';
+                if (statusText) statusText.innerText = '已阻击冲动 24 次，心如止水，波澜不惊';
+              }
+            }, 2400);
+
+            this.timers.profileWater = setTimeout(() => {
+              stage.classList.remove('is-rippling');
+              stage.classList.add('is-calmed');
+              if (badgeCard) badgeCard.classList.remove('badge-interactive-active');
+            }, 3800);
+          }
+        }
+
+        if (target === 'modal' || target === 'both') {
+          const mStage = document.getElementById('modal-water-stage');
+          const s1 = document.getElementById('step-node-1');
+          const s2 = document.getElementById('step-node-2');
+          const s3 = document.getElementById('step-node-3');
+          const desc = document.getElementById('modal-growth-desc');
+
+          if (mStage) {
+            if (this.timers.modalWater) clearTimeout(this.timers.modalWater);
+            mStage.classList.remove('is-idle', 'is-calmed', 'is-rippling');
+            void mStage.offsetWidth;
+
+            mStage.classList.add('is-rippling');
+
+            const setActive = (activeNode) => {
+              [s1, s2, s3].forEach(node => {
+                if (node) {
+                  node.className = "py-1 px-1.5 rounded-lg bg-[#FAF7F2] border border-[#EADBCA] text-[10px] text-[#707D76] transition-all";
+                }
+              });
+              if (activeNode) {
+                activeNode.className = "py-1 px-1.5 rounded-lg bg-[#345942] text-white font-bold border border-[#345942] text-[10px] shadow-xs transition-all";
+              }
+            };
+
+            setActive(s1);
+            if (desc) desc.innerText = '“晶莹露滴悄然坠落，唤醒深藏内心的自律静流...”';
+
+            setTimeout(() => {
+              if (mStage.classList.contains('is-rippling')) {
+                setActive(s2);
+                if (desc) desc.innerText = '“水纹层层向外荡漾，涤尽一时冲动与物欲浮躁...”';
+              }
+            }, 1200);
+
+            setTimeout(() => {
+              if (mStage.classList.contains('is-rippling')) {
+                setActive(s3);
+                if (desc) desc.innerText = '“心若止水，波澜不惊。守住钱袋，笃定前行。”';
+              }
+            }, 2400);
+
+            this.timers.modalWater = setTimeout(() => {
+              mStage.classList.remove('is-rippling');
+              mStage.classList.add('is-calmed');
+            }, 3800);
+          }
+        }
+      },
+
+      // 4. 统一声学引擎接口
+      audio: {
+        getContext: getAudioContext,
+        playWindChime: playWindChimeSound,
+        playLeafRustle: playWindChimeSound, // 统一为清澈治愈的风铃音
+        playCuteApproval: playCuteApprovalSound,
+        playDewdropGrowth: playDewdropAndGrowthSound,
+        playStillWater: playStillWaterSound,
+        playCelebration: playSaveCelebrationSound
+      }
+    };
+
+    // 全局快捷调用函数 (保证各处事件绑定一致性)
+    function tapTomatoRibbon() {
+      BotanicalEngine.breatheSpecimen();
+    }
+
+    function triggerBadgeGrowth(target = 'profile') {
+      BotanicalEngine.growBadge(target);
+    }
+
+    function triggerBadgeWater(target = 'profile') {
+      BotanicalEngine.rippleWater(target);
+    }
+
+    function replayActiveBadge(target = 'profile') {
+      if (BotanicalEngine.activeBadge === 'water') {
+        BotanicalEngine.rippleWater(target);
+      } else {
+        BotanicalEngine.growBadge(target);
+      }
+    }
+
+    function switchModalBadgeTab(type) {
+      BotanicalEngine.activeBadge = type;
+      const tabFlower = document.getElementById('modal-tab-flower');
+      const tabWater = document.getElementById('modal-tab-water');
+      const plantStage = document.getElementById('modal-plant-stage');
+      const waterStage = document.getElementById('modal-water-stage');
+      const tag = document.getElementById('modal-badge-tag');
+      const title = document.getElementById('modal-badge-title');
+      const sub = document.getElementById('modal-badge-sub');
+      const s1 = document.getElementById('step-node-1');
+      const s2 = document.getElementById('step-node-2');
+      const s3 = document.getElementById('step-node-3');
+      const actionBtn = document.getElementById('btn-modal-trigger-action');
+      const actionLabel = document.getElementById('modal-action-label');
+      const desc = document.getElementById('modal-growth-desc');
+
+      if (type === 'flower') {
+        if (tabFlower) {
+          tabFlower.className = "flex-1 py-1 px-2.5 rounded-full text-[11px] font-bold transition-all bg-[#E34A32] text-white shadow-2xs";
+        }
+        if (tabWater) {
+          tabWater.className = "flex-1 py-1 px-2.5 rounded-full text-[11px] font-bold transition-all text-[#707D76] hover:text-[#1C2621]";
+        }
+        if (plantStage) plantStage.classList.remove('hidden');
+        if (waterStage) waterStage.classList.add('hidden');
+
+        if (tag) {
+          tag.innerText = "复古手账图鉴";
+          tag.className = "text-[10px] text-[#E34A32] font-bold bg-[#FAF2F0] px-2.5 py-0.5 rounded-full border border-[#F6DCD8]";
+        }
+        if (title) title.innerText = "克制之花 · 成长手记";
+        if (sub) sub.innerText = "连续坚持 30 天理智消费之具象";
+
+        if (s1) s1.innerText = "① 种子破土";
+        if (s2) s2.innerText = "② 舒叶展枝";
+        if (s3) s3.innerText = "③ 繁花初绽";
+        [s1, s2, s3].forEach(node => {
+          if (node) node.className = "py-1 px-1.5 rounded-lg bg-[#FAF7F2] border border-[#EADBCA] text-[10px] text-[#707D76]";
+        });
+
+        if (actionBtn) {
+          actionBtn.className = "flex-1 bg-[#E34A32] hover:bg-[#D13F27] text-white py-3 rounded-xl font-bold text-xs shadow-softBtnRed active:scale-95 transition-transform flex items-center justify-center gap-1.5 border border-[#F27763]/25";
+        }
+        if (actionLabel) actionLabel.innerText = "再次浇灌唤醒";
+        if (desc) desc.innerText = "“每一次对冲动消费的克制，都是对理想生活的一次温润浇灌。克制之花，由心而生。”";
+
+        triggerBadgeGrowth('modal');
+      } else {
+        if (tabWater) {
+          tabWater.className = "flex-1 py-1 px-2.5 rounded-full text-[11px] font-bold transition-all bg-[#345942] text-white shadow-2xs";
+        }
+        if (tabFlower) {
+          tabFlower.className = "flex-1 py-1 px-2.5 rounded-full text-[11px] font-bold transition-all text-[#707D76] hover:text-[#1C2621]";
+        }
+        if (plantStage) plantStage.classList.add('hidden');
+        if (waterStage) waterStage.classList.remove('hidden');
+
+        if (tag) {
+          tag.innerText = "静心止水泉谱";
+          tag.className = "text-[10px] text-[#345942] font-bold bg-[#EBF4EE] px-2.5 py-0.5 rounded-full border border-[#D5E8DC]";
+        }
+        if (title) title.innerText = "心如止水 · 静心泉谱";
+        if (sub) sub.innerText = "阻击冲动 24 次，心平如镜波澜不惊";
+
+        if (s1) s1.innerText = "① 露滴落水";
+        if (s2) s2.innerText = "② 涟漪荡漾";
+        if (s3) s3.innerText = "③ 静水深流";
+        [s1, s2, s3].forEach(node => {
+          if (node) node.className = "py-1 px-1.5 rounded-lg bg-[#FAF7F2] border border-[#EADBCA] text-[10px] text-[#707D76]";
+        });
+
+        if (actionBtn) {
+          actionBtn.className = "flex-1 bg-[#345942] hover:bg-[#2A4935] text-white py-3 rounded-xl font-bold text-xs shadow-softBtnGreen active:scale-95 transition-transform flex items-center justify-center gap-1.5 border border-[#345942]/25";
+        }
+        if (actionLabel) actionLabel.innerText = "再次涤心静水";
+        if (desc) desc.innerText = "“心若止水，波澜不惊；物欲退去，宁静常在。已成功阻击 24 次冲动消费。”";
+
+        triggerBadgeWater('modal');
+      }
+    }
+
+    function triggerActiveBadgeModal() {
+      if (BotanicalEngine.activeBadge === 'water') {
+        triggerBadgeWater('modal');
+      } else {
+        triggerBadgeGrowth('modal');
+      }
+    }
+
+    // 打开/关闭成就图鉴全屏弹窗
+    function openBadgeGrowthModal(initialTab = 'flower') {
+      const modal = document.getElementById('modal-badge-detail');
+      if (modal) {
+        modal.classList.remove('hidden');
+        switchModalBadgeTab(initialTab);
+      }
+    }
+
+    function closeBadgeGrowthModal() {
+      const modal = document.getElementById('modal-badge-detail');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function showStillWaterTip() {
+      triggerBadgeWater('profile');
+    }
+
+    // 页面加载完成后初始化自律日历
+    window.addEventListener('DOMContentLoaded', () => {
+      if (typeof statsCalendarSystem !== 'undefined') {
+        statsCalendarSystem.init();
+      }
+    });
+    // 立即执行一次保障在 iframe/开发环境中也生效
+    if (typeof statsCalendarSystem !== 'undefined') {
+      statsCalendarSystem.init();
+    }
+  </script>
+</body>
+</html>

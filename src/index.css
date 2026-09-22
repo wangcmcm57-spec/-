@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+  --font-din: "DIN Alternate", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background-color: #FAF9F6;
+  color: #1A1A1A;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
